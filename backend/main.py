@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -6,18 +7,17 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, nickname: str):
         await websocket.accept()
         self.active_connections.append(websocket)
-        print('Alguém entrou no chat.')
+        await self.broadcast(f'  "{nickname}" entrou no chat.')
 
-    def disconnect(self, websocket: WebSocket):
+    def disconnect(self, websocket: WebSocket, nickname: str):
         self.active_connections.remove(websocket)
-        print('Alguém saiu do chat.')
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, content: str):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            await connection.send_text(content)
 
 manager = ConnectionManager()
 
@@ -26,13 +26,15 @@ def root():
     return {"message": "Hello World"}
 
 @app.websocket("/ws") 
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
-    await manager.connect(websocket)
+async def websocket_chat(websocket: WebSocket, nickname: str):
+    await manager.connect(websocket, nickname)
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"#{client_id}: {data}")
+            timestamp = datetime.now().strftime("%H:%M")
+            await manager.broadcast(f"{nickname} ({timestamp} UTC-3):\n‖ {data}")
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        await manager.broadcast(f"User #{client_id} has left the chat.")
+        manager.disconnect(websocket, nickname)
+        await manager.broadcast(f'  "{nickname}" saiu do chat.')
+
 
