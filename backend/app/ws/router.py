@@ -29,7 +29,7 @@ async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depend
         while True:
             content = await websocket.receive_text()
             await repository.save_message(db, nickname, content)
-            await manager.broadcast(f"{nickname} ({timestamp} UTC-3):\n‖ {content}")
+            await manager.broadcast(f"{nickname}: \n‖ {content}")
     except WebSocketDisconnect:
         manager.disconnect(websocket, nickname)
-        await self.broadcast(f'  "{nickname}" saiu do chat.')
+        await manager.broadcast(f'  "{nickname}" saiu do chat.')
