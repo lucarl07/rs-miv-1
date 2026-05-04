@@ -1,6 +1,7 @@
 # Módulos do Projeto
 from app.db import get_db
-from .manager import manager
+from app.ws import repository
+from app.ws.manager import manager
 
 # Bibliotecas Nativas
 from datetime import datetime, timezone
@@ -21,16 +22,14 @@ async def root(db: AsyncSession = Depends(get_db)):
     value = result.scalar()
     return {"message": value}
 
-@router.websocket("/ws") 
-async def ws_chat(websocket: WebSocket, nickname: str):
+@router.websocket("/ws")
+async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depends(get_db)):
     await manager.connect(websocket, nickname)
     try:
         while True:
-            data = await websocket.receive_text()
-            timestamp = datetime.now().strftime("%H:%M")
-            await manager.broadcast(f"{nickname} ({timestamp} UTC-3):\n‖ {data}")
+            content = await websocket.receive_text()
+            await repository.save_message(db, nickname, content)
+            await manager.broadcast(f"{nickname} ({timestamp} UTC-3):\n‖ {content}")
     except WebSocketDisconnect:
         manager.disconnect(websocket, nickname)
-        await manager.broadcast(f'  "{nickname}" saiu do chat.')
-
-
+        await self.broadcast(f'  "{nickname}" saiu do chat.')
