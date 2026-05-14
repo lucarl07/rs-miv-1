@@ -1,18 +1,22 @@
 <script setup lang="ts">
   const props = defineProps({
-    user_nickname: String,
+    username: String,
     content: String,
-    sent_at: Date
+    timestamp: String
   });
+
+  const typedDate: Date = new Date(props.timestamp)
+  const sentAt: String = typedDate.toLocaleString("pt-BR");
 </script>
 
 <template>
-  <li>
-    <figure>
-      <figcaption>
-        <span>{user_nickname}</span>
-      </figcaption>
-    </figure>
-  </li>
+  <header>
+    <span id="message_username">{{username}}</span>
+    <br />
+    <span id="message_sentAt">{{sentAt}}</span>
+  </header>
+  <span id="message_content">
+    {{content}}
+  </span>
 </template>
 
