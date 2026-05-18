@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import Message from "./Message.vue"
+  import MessageInput from "./MessageInput.vue"
   import useWebSocket from "../composables/useWebSocket.js"
 
   const _messages = [
@@ -14,6 +15,8 @@
 
   const nickname = "luiz"
   const { status, messages, send } = useWebSocket(`ws://localhost:8000/ws?nickname=${nickname}`)
+
+  const handleSend = (payload) => send(payload, nickname)
 </script>
 
 <template>
@@ -36,6 +39,7 @@
           />
       </li>
     </ol>
+    <MessageInput @send="handleSend"/>
   </main>
 </template>
 

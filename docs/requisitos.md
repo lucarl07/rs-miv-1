@@ -12,7 +12,7 @@ Um projeto de Luiz Carlos Jr. ([lucarl07](https://github.com/lucarl07))
 - [X] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
 
 ### MENSAGERIA EM TEMPO REAL:
-- [B] **Envio de mensagens:** Usuários devem poder redigir e enviar mensagens de texto.
+- [X] **Envio de mensagens:** Usuários devem poder redigir e enviar mensagens de texto.
 - [X] **Recebimento de mensagens:** A interface de todos os usuários conectados deve ser atualizada com a nova mensagem recebida, sem atualizar a página.
 - [X] **Identificação de autoria:** Cada mensagem exibida deve estar acompanhada do apelido do remetente e do horário do envio (timestamp).
 
