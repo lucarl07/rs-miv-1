@@ -3,6 +3,7 @@ import { ref, onUnmounted } from 'vue'
 export default function useWebSocket(url) {
   const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
   const messages = ref([])
+
   let ws = null
   let reconnectTimer = null
 
@@ -11,7 +12,7 @@ export default function useWebSocket(url) {
 
     ws.onopen = () => {
       status.value = 'connected'
-      // console.log("Conectado!")
+      console.log("Conectado!")
       clearTimeout(reconnectTimer)
     }
 
@@ -24,6 +25,7 @@ export default function useWebSocket(url) {
       status.value = 'reconnecting'
       // Tenta reconectar após 3 segundos
       reconnectTimer = setTimeout(connect, 3000)
+      console.log("Desconectado.")
     }
 
     ws.onerror = () => {

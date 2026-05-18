@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import Message from "./Message.vue"
+  import useWebSocket from "../composables/useWebSocket.js"
 
-  const messages = [
+  const _messages = [
     // Array demonstrativa apenas; O template usará os dados recebidos pela API.
     {
       id: '10aec4a9-805b-456d-9bf2-2807aec1e783',
@@ -11,14 +12,24 @@
     },
   ]
 
-  console.log(messages[0])
+  const nickname = "luiz"
+  const { status, messages, send } = useWebSocket(`ws://localhost:8000/ws?nickname=${nickname}`)
 </script>
 
 <template>
   <main>
     <ol>
       <li v-for="(message, index) in messages" :key="message.id">
-        <Message
+        <!--
+          Lógica primitiva para diferenciar mensagens do sistema
+          de mensagens de usuários (no momento, sem distinção):
+        -->
+        <Message v-if="message.nickname !== '%sys%'"
+          :username="message.nickname"
+          :content="message.content"
+          :timestamp="message.timestamp"
+          />
+        <Message v-else
           :username="message.nickname"
           :content="message.content"
           :timestamp="message.timestamp"
