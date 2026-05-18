@@ -6,9 +6,15 @@ Um projeto de Luiz Carlos Jr. ([lucarl07](https://github.com/lucarl07))
 
 ## Requisitos Funcionais
 
+Glossário:
+- [vazio] = Pendente;
+- B = Concluído no back-end apenas (válido apenas para requisitos full-stack);
+- F = Concluído no front-end apenas (válido apenas para requisitos full-stack);
+- X = Concluído (no escopo geral da aplicação).
+
 ### GESTÃO DE CONEXÃO E IDENTIFICAÇÃO:
 - [ ] **Cadastro e Autenticação:** Todos os usuários na plataforma devem estar registrados em uma conta com nome/apelido, email e senha.
-- [X] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido for definido.
+- [ ] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido único do usuário for definido.
 - [X] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
 
 ### MENSAGERIA EM TEMPO REAL:
@@ -18,7 +24,7 @@ Um projeto de Luiz Carlos Jr. ([lucarl07](https://github.com/lucarl07))
 
 ### INTERFACE E FEEDBACK:
 - [B] **Histórico Local Volátil:** O sistema deve manter o histórico das mensagens enviadas e recebidas durante a sessão atual (enquanto a aba estiver aberta).
-- [B] **Limpeza de Input:** O sistema deve limpar o campo de digitação imediatamente após o envio bem-sucedido de uma mensagem.
+- [X] **Limpeza de Input:** O sistema deve limpar o campo de digitação imediatamente após o envio bem-sucedido de uma mensagem.
 
 ### CONTROLE DE ESTADO:
 - [ ] **Visualização de Status:** O sistema deve exibir um indicador visual mostrando se o usuário está atualmente conectado ao servidor de WebSockets.
