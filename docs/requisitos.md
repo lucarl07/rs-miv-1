@@ -8,13 +8,13 @@ Um projeto de Luiz Carlos Jr. ([lucarl07](https://github.com/lucarl07))
 
 ### GESTÃO DE CONEXÃO E IDENTIFICAÇÃO:
 - [ ] **Cadastro e Autenticação:** Todos os usuários na plataforma devem estar registrados em uma conta com nome/apelido, email e senha.
-- [B] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido for definido.
-- [B] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
+- [X] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido for definido.
+- [X] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
 
 ### MENSAGERIA EM TEMPO REAL:
 - [B] **Envio de mensagens:** Usuários devem poder redigir e enviar mensagens de texto.
-- [B] **Recebimento de mensagens:** A interface de todos os usuários conectados deve ser atualizada com a nova mensagem recebida, sem atualizar a página.
-- [B] **Identificação de autoria:** Cada mensagem exibida deve estar acompanhada do apelido do remetente e do horário do envio (timestamp).
+- [X] **Recebimento de mensagens:** A interface de todos os usuários conectados deve ser atualizada com a nova mensagem recebida, sem atualizar a página.
+- [X] **Identificação de autoria:** Cada mensagem exibida deve estar acompanhada do apelido do remetente e do horário do envio (timestamp).
 
 ### INTERFACE E FEEDBACK:
 - [B] **Histórico Local Volátil:** O sistema deve manter o histórico das mensagens enviadas e recebidas durante a sessão atual (enquanto a aba estiver aberta).
