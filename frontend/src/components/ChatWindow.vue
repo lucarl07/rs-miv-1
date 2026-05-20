@@ -6,7 +6,7 @@
   const nickname = "luiz"
   const { status, messages, send } = useWebSocket(`ws://localhost:8000/ws?nickname=${nickname}`)
 
-  const handleSend = (payload) => send(payload, nickname)
+  const handleSend = (content) => send(content, nickname)
 </script>
 
 <template>
