@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/* Variáveis Globais: */
+@theme {
+  /* Cores: */
+  --color-liquorice: #22191D;
+  --color-grey-100: #d9d9d9;
+  --color-grey-500: #888888;
+}
+
 body {
-  background-color: 'white';
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  color: var(--color-grey-100);
+  background-color: var(--color-liquorice);
+  font-size: 1rem;
 }
 
