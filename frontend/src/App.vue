@@ -3,8 +3,6 @@
 </script>
 
 <template>
-  <h1>RS-MIV-1</h1>
-  <!-- Iniciando o projeto... -->
   <ChatWindow />
 </template>
 

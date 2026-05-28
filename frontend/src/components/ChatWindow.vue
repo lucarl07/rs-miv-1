@@ -11,9 +11,9 @@
 </script>
 
 <template>
-  <main>
-    <ol>
-      <li v-for="(message, index) in messages" :key="message.id">
+  <main class="my-10 w-4/5 md:w-9/10 mx-auto">
+    <ol class="flex flex-col gap-10">
+      <li v-for="(message, index) in messages" :key="message.id" >
         <!--
           Lógica primitiva para diferenciar mensagens do sistema
           de mensagens de usuários (no momento, sem distinção):
