@@ -11,8 +11,8 @@
 </script>
 
 <template>
-  <main class="my-10 w-4/5 md:w-9/10 mx-auto">
-    <ol class="flex flex-col gap-10">
+  <main class="flex flex-col flex-1 overflow-hidden mx-auto px-1 w-5/8">
+    <ol class="flex flex-col flex-1 overflow-y-auto mt-10 h-full">
       <li v-for="(message, index) in messages" :key="message.id" >
         <!--
           Lógica primitiva para diferenciar mensagens do sistema
@@ -30,7 +30,10 @@
           />
       </li>
     </ol>
-    <MessageInput @send="handleSend"/>
+    <MessageInput
+      @send="handleSend"
+      class="mb-10"
+    />
   </main>
 </template>
 

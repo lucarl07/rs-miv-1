@@ -10,7 +10,7 @@
 </script>
 
 <template>
-  <article>
+  <article class="mb-6">
     <header class="flex gap-2">
       <span
         id="message_username"
