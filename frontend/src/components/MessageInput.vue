@@ -6,7 +6,9 @@
   const message = ref('')
 
   function handleSubmit() {
-    emit('send', message.value)
+    if (message.value.length > 0) {
+      emit('send', message.value)
+    }
     message.value = ''
   }
 </script>
