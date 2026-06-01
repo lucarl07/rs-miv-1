@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  const props = defineProps({
+  const props = defineProps<{
     username: String,
     content: String,
     timestamp: String
-  });
+  }>();
 
   const typedDate: Date = new Date(props.timestamp)
   const sentAt: String = typedDate.toLocaleString("pt-BR");
