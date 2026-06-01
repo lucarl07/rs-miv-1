@@ -3,7 +3,7 @@
     username: String,
     content: String,
     timestamp: String,
-    isSystemMessage: { type: Boolean }
+    isSystemMessage?: { type: Boolean }
   }>();
 
   // Date of the sent message
