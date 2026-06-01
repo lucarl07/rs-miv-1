@@ -14,10 +14,6 @@
   <main class="flex flex-col flex-1 overflow-hidden mx-auto px-1 w-5/8">
     <ol class="flex flex-col flex-1 overflow-y-auto mt-10 h-full">
       <li v-for="(message, index) in messages" :key="message.id" >
-        <!--
-          Lógica primitiva para diferenciar mensagens do sistema
-          de mensagens de usuários (no momento, sem distinção):
-        -->
         <Message v-if="message.nickname !== '%sys%'"
           :username="message.nickname"
           :content="message.content"
@@ -27,7 +23,7 @@
           username="Mensagem do sistema"
           :content="message.content"
           :timestamp="message.timestamp"
-          isSystemMessage="true"
+          :isSystemMessage="true"
           />
       </li>
     </ol>
