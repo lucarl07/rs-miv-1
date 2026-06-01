@@ -20,7 +20,7 @@ html, body, #app {
 
 body {
   color: var(--color-grey-100);
-  background-color: Var(--color-liquorice);
+  background-color: var(--color-liquorice);
   font-size: 1rem;
 }
 
