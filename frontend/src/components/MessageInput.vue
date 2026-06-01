@@ -7,11 +7,21 @@
 
   const message = ref('')
 
-  function handleSubmit() {
+  function triggerSendEmit() {
     if (message.value.length > 0) {
       emit('send', message.value)
     }
     message.value = ''
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.altKey && !event.shiftKey) {
+      event.preventDefault()
+      triggerSendEmit()
+    }
+  }
+  const handleSubmit = () => {
+    triggerSendEmit()
   }
 </script>
 
@@ -24,6 +34,7 @@
   >
     <textarea
       v-model="message"
+      @keydown="handleKeyDown"
       autofocus="true"
       spellcheck="true"
       minlength="1"
