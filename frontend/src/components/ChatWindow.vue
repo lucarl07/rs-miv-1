@@ -24,9 +24,10 @@
           :timestamp="message.timestamp"
           />
         <Message v-else
-          :username="message.nickname"
+          username="Mensagem do sistema"
           :content="message.content"
           :timestamp="message.timestamp"
+          isSystemMessage="true"
           />
       </li>
     </ol>

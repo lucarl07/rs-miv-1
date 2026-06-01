@@ -2,11 +2,15 @@
   const props = defineProps<{
     username: String,
     content: String,
-    timestamp: String
+    timestamp: String,
+    isSystemMessage: { type: Boolean }
   }>();
 
   const typedDate: Date = new Date(props.timestamp)
   const sentAt: String = typedDate.toLocaleString("pt-BR");
+  const sysMsgClasses = props.isSystemMessage
+    ? 'italic text-[#956f81]'
+    : ''
 </script>
 
 <template>
@@ -14,7 +18,7 @@
     <header class="flex gap-2">
       <span
         id="message_username"
-        class="font-bold"
+        :class="['font-bold', sysMsgClasses]"
       >
         {{username}}
       </span>
