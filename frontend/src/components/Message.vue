@@ -6,8 +6,19 @@
     isSystemMessage: { type: Boolean }
   }>();
 
-  const typedDate: Date = new Date(props.timestamp)
-  const sentAt: String = typedDate.toLocaleString("pt-BR");
+  // Date of the sent message
+  const typedDate: Date = new Date('2020-01-24')
+  const currentDate: Date = new Date()
+  // const sentAt: String = typedDate.toLocaleString('pt-BR');
+
+  let sentAt: String
+
+  if (typedDate.getFullYear() < currentDate.getFullYear()) {
+    sentAt = `${typedDate.getDate() + 1} de ${typedDate.getMonth() + 1}`
+  } else {
+    sentAt = typedDate.toLocaleString('pt-BR');
+  }
+
   const sysMsgClasses = props.isSystemMessage
     ? 'italic text-[#956f81]'
     : ''
