@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import formatDate from '../utils/formatDate.ts'
+
   const props = defineProps<{
     username: String,
     content: String,
@@ -6,18 +8,8 @@
     isSystemMessage?: Boolean
   }>();
 
-  // Date of the sent message
-  const typedDate: Date = new Date('2020-01-24')
-  const currentDate: Date = new Date()
-  // const sentAt: String = typedDate.toLocaleString('pt-BR');
-
-  let sentAt: String
-
-  if (typedDate.getFullYear() < currentDate.getFullYear()) {
-    sentAt = `${typedDate.getDate() + 1} de ${typedDate.getMonth() + 1}`
-  } else {
-    sentAt = typedDate.toLocaleString('pt-BR');
-  }
+  const typedDate: Date = new Date(props.timestamp)
+  const sentAt = formatDate(typedDate)
 
   const sysMsgClasses = props.isSystemMessage
     ? 'italic text-[#956f81]'
