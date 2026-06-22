@@ -32,14 +32,12 @@ async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depend
             data = json.loads(await websocket.receive_text()) 
             content = data["content"]
 
-            await repository.save_message(db, nickname, content)
+            message = await repository.save_message(db, nickname, content)
             await manager.broadcast(json.dumps({
+                "id": message.id,
                 "nickname": nickname,
                 "content": content,
                 "timestamp": datetime.now(timezone.utc).isoformat()
-                # A RESOLVER: Não é estranho ter que usar 3 tempos 'diferentes'
-                # sempre? Porque há o tempo do cliente, da API e do banco de 
-                # dados...
             }))
     except WebSocketDisconnect:
         manager.disconnect(websocket, nickname)
