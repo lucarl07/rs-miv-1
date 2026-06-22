@@ -5,6 +5,7 @@ from app.ws.manager import manager
 
 # Bibliotecas Nativas
 import json
+from uuid import uuid4
 from datetime import datetime, timezone
 
 # Bibliotecas Externas
@@ -43,6 +44,7 @@ async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depend
         manager.disconnect(websocket, nickname)
 
         await manager.broadcast(json.dumps({
+            "id": str(uuid4()),
             "nickname": "%sys%",
             "content": f"{nickname} saiu do chat",
             "timestamp": datetime.now(timezone.utc).isoformat()

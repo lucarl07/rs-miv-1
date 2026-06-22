@@ -1,6 +1,9 @@
-# Bibliotecas do Projeto
+# Bibliotecas Nativas
 import json
+from uuid import uuid4
 from datetime import datetime, timezone
+
+# Bibliotecas Externas
 from fastapi import WebSocket
 
 class ConnectionManager:
@@ -17,6 +20,7 @@ class ConnectionManager:
         self.active_connections[nickname] = websocket
 
         await self.broadcast(json.dumps({
+            "id": str(uuid4()),
             "nickname": "%sys%",
             "content": f"{nickname} entrou no chat",
             "timestamp": datetime.now(timezone.utc).isoformat()
