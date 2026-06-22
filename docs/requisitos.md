@@ -6,19 +6,25 @@ Um projeto de Luiz Carlos Jr. ([lucarl07](https://github.com/lucarl07))
 
 ## Requisitos Funcionais
 
+Glossário:
+- [vazio] = Pendente;
+- B = Concluído no back-end apenas (válido apenas para requisitos full-stack);
+- F = Concluído no front-end apenas (válido apenas para requisitos full-stack);
+- X = Concluído (no escopo geral da aplicação).
+
 ### GESTÃO DE CONEXÃO E IDENTIFICAÇÃO:
 - [ ] **Cadastro e Autenticação:** Todos os usuários na plataforma devem estar registrados em uma conta com nome/apelido, email e senha.
-- [B] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido for definido.
-- [B] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
+- [ ] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido único do usuário for definido.
+- [X] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
 
 ### MENSAGERIA EM TEMPO REAL:
-- [B] **Envio de mensagens:** Usuários devem poder redigir e enviar mensagens de texto.
-- [B] **Recebimento de mensagens:** A interface de todos os usuários conectados deve ser atualizada com a nova mensagem recebida, sem atualizar a página.
-- [B] **Identificação de autoria:** Cada mensagem exibida deve estar acompanhada do apelido do remetente e do horário do envio (timestamp).
+- [X] **Envio de mensagens:** Usuários devem poder redigir e enviar mensagens de texto.
+- [X] **Recebimento de mensagens:** A interface de todos os usuários conectados deve ser atualizada com a nova mensagem recebida, sem atualizar a página.
+- [X] **Identificação de autoria:** Cada mensagem exibida deve estar acompanhada do apelido do remetente e do horário do envio (timestamp).
 
 ### INTERFACE E FEEDBACK:
 - [B] **Histórico Local Volátil:** O sistema deve manter o histórico das mensagens enviadas e recebidas durante a sessão atual (enquanto a aba estiver aberta).
-- [B] **Limpeza de Input:** O sistema deve limpar o campo de digitação imediatamente após o envio bem-sucedido de uma mensagem.
+- [X] **Limpeza de Input:** O sistema deve limpar o campo de digitação imediatamente após o envio bem-sucedido de uma mensagem.
 
 ### CONTROLE DE ESTADO:
 - [ ] **Visualização de Status:** O sistema deve exibir um indicador visual mostrando se o usuário está atualmente conectado ao servidor de WebSockets.
