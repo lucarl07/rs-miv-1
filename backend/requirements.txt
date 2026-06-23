@@ -3,3 +3,5 @@ uvicorn[standard]
 sqlalchemy[asyncio]
 aiosqlite
 python-dotenv
+passlib[bcrypt]
+python-jose[cryptography]
