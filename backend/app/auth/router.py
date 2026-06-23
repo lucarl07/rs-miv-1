@@ -41,3 +41,31 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) ->
     await db.refresh(new_user)
     return new_user
 
+@router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
+async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
+    """Realiza o login na conta de um usuário, atribuindo a ele um JWT de acesso."""
+
+    result = await db.execute(
+        select(User).where(User.email == user_data.email)
+    )
+
+    user = result.scalar_one_or_none() 
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="E-mail ou senha incorretos."
+        )
+    
+    passwords_match = verify_password(user_data.password, user.hashed_password)
+    if not passwords_match:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="E-mail ou senha incorretos."
+        )
+    
+    access_token = create_access_token(user.id) 
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
