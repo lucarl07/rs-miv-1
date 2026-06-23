@@ -13,18 +13,11 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import WebSocket
 from fastapi import WebSocketDisconnect
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter()
+router = APIRouter(prefix="/ws", tags=["websockets"])
 
-@router.get("/")
-async def root(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(text("SELECT 'Hello World'"))
-    value = result.scalar()
-    return {"message": value}
-
-@router.websocket("/ws")
+@router.websocket("") # Endpoint padrão
 async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depends(get_db)):
     await manager.connect(websocket, nickname)
 

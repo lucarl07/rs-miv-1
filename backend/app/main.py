@@ -4,7 +4,7 @@ from fastapi import FastAPI
 # Módulos do Projeto
 from .db import Base
 from .db import engine
-from .ws.router import router
+from .router import router
 
 app = FastAPI()
 app.include_router(router)
