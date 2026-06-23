@@ -26,6 +26,9 @@ def create_access_token(user_id: str, expires_delta: timedelta | None = None) ->
 
     Usamos o id em vez do nickname porque o id é imutável, enquanto o
     nickname pode vir a ser alterado no futuro.
+
+    Por padrão, o tempo de expiração para cada JWT é de 60 minutos após sua 
+    criação.
     """
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
