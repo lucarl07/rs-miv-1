@@ -1,9 +1,9 @@
 # Módulos da Aplicação
-from app.auth.jwt import create_access_token
-from app.auth.pw_hashing import hash_password, verify_password
 from app.db import get_db
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
+from app.utils.jwt import create_access_token
+from app.utils.pw_hashing import hash_password, verify_password
 
 # Bibliotecas Externas
 from fastapi import APIRouter, Depends, HTTPException, status
