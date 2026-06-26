@@ -1,12 +1,25 @@
+# Bibliotecas Nativas
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
+
+# Bibliotecas Externas
+from pydantic import BaseModel, EmailStr, ConfigDict, Field, SecretStr, field_validator
+
+# Módulos do Sistema
+from app.utils.data_validation import check_pw_validity
 
 class UserCreate(BaseModel):
     """Schema de entrada para o registro de um novo usuário."""
 
     nickname: str = Field(min_length=3, max_length=50)
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: SecretStr = Field() # Toda validação ocorre no field validator
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_strength(cls, v: SecretStr) -> SecretStr:
+        pw = v.get_secret_value()
+        check_pw_validity(pw)
+        return v
 
 
 class UserLogin(BaseModel):
