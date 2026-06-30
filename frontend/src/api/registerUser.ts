@@ -1,3 +1,5 @@
+import formatPydanticErrors from "@/utils/formatPydanticErrors"
+
 const API_URL = import.meta.env.VITE_API_URL
 
 /** Para cadastrar usuário:
@@ -12,21 +14,6 @@ const API_URL = import.meta.env.VITE_API_URL
  *    servidor)
  *    - Caso bem sucedido: redirecionar para a página de login.
  */
-
-function formatPydanticErrors(errors: any[]): string {
-  let strErrors = ''
-  let len = errors.length
-
-  for (let i = 0; i < len; i++) {
-    if (i !== len - 1) {
-      strErrors += `${i+1}. ${errors[i].msg};\n`
-    } else {
-      strErrors += `${i+1}. ${errors[i].msg}.\n`
-    }
-  }
-
-  return strErrors
-}
 
 async function registerUser(
   { nickname, email, password }: RegisterUserPayload
