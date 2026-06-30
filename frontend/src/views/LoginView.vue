@@ -8,7 +8,7 @@
       Entre na sua conta e se divirta com os seus amigos!
     </h1>
     <div class="flex flex-1 items-center justify-center">
-      <p>Olá mundo!</p>
+      <LoginForm />
     </div>
   </main>
 </template>
