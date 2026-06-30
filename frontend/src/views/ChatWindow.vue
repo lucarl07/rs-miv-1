@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import Message from "./Message.vue"
-  import MessageInput from "./MessageInput.vue"
-  import useWebSocket from "../composables/useWebSocket.js"
-  import genUniqueNickname from '../utils/genUniqueNickname.ts'
+  import Message from "@/components/Message.vue"
+  import MessageInput from "@/components/MessageInput.vue"
+  import useWebSocket from "@/composables/useWebSocket.js"
+  import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
   const nickname = genUniqueNickname("luiz")
   const { status, messages, send } = useWebSocket(`ws://localhost:8000/ws?nickname=${nickname}`)
