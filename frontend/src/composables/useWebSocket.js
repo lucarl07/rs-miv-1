@@ -1,3 +1,5 @@
+/* TODO: Trocar a extensão do arquivo para .ts e fazer tipagem TypeScript */
+
 import { ref, onUnmounted } from 'vue'
 
 export default function useWebSocket(url) {
