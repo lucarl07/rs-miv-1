@@ -8,7 +8,7 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-interface RegisterUserRequestBody {
+interface RegisterUserPayload {
   nickname: string
   email: string
   password: string

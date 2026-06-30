@@ -12,21 +12,39 @@ const API_URL = import.meta.env.VITE_API_URL
  *    servidor)
  *    - Caso bem sucedido: redirecionar para a página de login.
  */
-async function registerUser(
-  { nickname, email, password }: RegisterUserRequestBody
-): RegisterUserResponse {
-  try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ nickname, email, password }),
-    })
 
-    // TODO: Continuar lógica
-  } catch (error) {
-    // TODO: Tratamento de erro
+function formatPydanticErrors(errors: any[]): string {
+  let strErrors = ''
+  let len = errors.length
+
+  for (let i = 0; i < len; i++) {
+    if (i !== len - 1) {
+      strErrors += `${i+1}. ${errors[i].msg};\n`
+    } else {
+      strErrors += `${i+1}. ${errors[i].msg}.\n`
+    }
+  }
+
+  return strErrors
+}
+
+async function registerUser(
+  { nickname, email, password }: RegisterUserPayload
+): RegisterUserResponse {
+
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: 'POST',
+    headers: { "Content-Type": "application/json", },
+    body: JSON.stringify({ nickname, email, password }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(
+      err.detail ??                       // Caso err.detail seja uma string simples
+      formatPydanticErrors(err.detail) ?? // Caso err.detail seja um retorno (objeto) do Pydantic
+      'Erro no cadastro.'                 // Caso err.detail seja outro formato
+    )
   }
 }
 
