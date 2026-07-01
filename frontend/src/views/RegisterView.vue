@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import RegisterForm from '@/components/RegisterForm.vue'
 </script>
 
 <template>
@@ -7,7 +8,7 @@
       Crie uma conta para não ficar de fora!
     </h1>
     <div class="flex flex-1 items-center justify-center">
-      <p>TODO</p>
+      <RegisterForm />
     </div>
   </main>
 </template>

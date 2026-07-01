@@ -25,3 +25,11 @@ interface LoginResponse {
   access_token: string
   token_type: string
 }
+
+interface SignupFormErrors {
+  email: string | null
+  password: string | null
+  confirmPassword: string | null
+  other: string | null
+}
+
