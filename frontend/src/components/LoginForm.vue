@@ -28,7 +28,7 @@
   }
 
   function handleRegister(): void {
-    router.push({ name: 'register' })
+    router.push({ name: 'signup' })
   }
 </script>
 

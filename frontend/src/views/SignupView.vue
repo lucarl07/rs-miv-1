@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import RegisterForm from '@/components/RegisterForm.vue'
+  import SignupForm from '@/components/SignupForm.vue'
 </script>
 
 <template>
@@ -8,7 +8,7 @@
       Crie uma conta para não ficar de fora!
     </h1>
     <div class="flex flex-1 items-center justify-center">
-      <RegisterForm />
+      <SignupForm />
     </div>
   </main>
 </template>
