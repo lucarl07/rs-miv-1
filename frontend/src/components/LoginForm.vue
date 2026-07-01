@@ -28,9 +28,7 @@
   }
 
   function handleRegister(): void {
-    // TODO: Criar página 'register'
-    // router.push({ name: 'register' })
-    console.log('[T.B.D]')
+    router.push({ name: 'register' })
   }
 </script>
 
