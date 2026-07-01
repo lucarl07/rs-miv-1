@@ -2,7 +2,11 @@
 
 import { ref, onUnmounted } from 'vue'
 
-export default function useWebSocket(url) {
+import useAuth from '@/composables/useAuth.ts'
+
+const WS_URL = import.meta.env.VITE_WS_URL
+
+export default function useWebSocket() {
   const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
   const messages = ref([])
 
@@ -10,7 +14,13 @@ export default function useWebSocket(url) {
   let reconnectTimer = null
 
   function connect() {
-    ws = new WebSocket(url)
+    const { token } = useAuth()
+
+    if (!token.value) {
+      return;
+    }
+
+    ws = new WebSocket(`${WS_URL}/ws?token=${token.value}`)
 
     ws.onopen = () => {
       status.value = 'connected'
@@ -35,9 +45,9 @@ export default function useWebSocket(url) {
     }
   }
 
-  function send(content, nickname) {
+  function send(content) {
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ content, nickname, timestamp: new Date().toISOString() }))
+      ws.send(JSON.stringify({ content }))
     }
   }
 
