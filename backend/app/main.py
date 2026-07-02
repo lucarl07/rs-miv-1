@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Módulos do Projeto
-from .db import Base
-from .db import engine
+from .conn.db import Base
+from .conn.db import engine
 from .router import router
 
 app = FastAPI()

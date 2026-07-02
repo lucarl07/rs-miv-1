@@ -1,4 +1,4 @@
-# Bibliotecas Locais
+# Bibliotecas Nativas
 import os 
 
 # Bibliotecas do Projeto

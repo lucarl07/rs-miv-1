@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime
 from datetime import datetime, timezone
 from uuid import uuid4
-from app.db import Base
+from app.conn.db import Base
 
 class Message(Base):
     __tablename__ = "messages"

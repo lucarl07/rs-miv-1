@@ -1,5 +1,5 @@
 # Módulos da Aplicação
-from app.db import get_db
+from app.conn.db import get_db
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 from app.utils.jwt import create_access_token
