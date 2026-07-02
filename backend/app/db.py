@@ -10,11 +10,11 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 # Carregando variáveis de ambiente
 load_dotenv()
-DATABASE_URL = os.getenv("TESTING_DB_URL")
+DB_URL = os.getenv("DB_URL")
 
 # Objetos para a conexão com o banco de dados
 engine = create_async_engine(
-    DATABASE_URL, 
+    DB_URL, 
     connect_args={"check_same_thread": False}, 
     echo=True # Por enquanto, apenas para debugar
 )
