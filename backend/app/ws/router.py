@@ -1,5 +1,5 @@
 # Módulos do Projeto
-from app.db import get_db
+from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
 from app.ws import repository

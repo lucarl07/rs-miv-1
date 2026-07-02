@@ -1,4 +1,4 @@
-from .db import get_db
+from .conn.db import get_db
 from .auth.router import router as auth_router
 from .ws.router import router as ws_router
 
