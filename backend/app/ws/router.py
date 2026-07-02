@@ -1,5 +1,7 @@
 # Módulos do Projeto
 from app.db import get_db
+from app.models.user import User
+from app.utils.jwt import decode_access_token
 from app.ws import repository
 from app.ws.manager import manager
 
@@ -9,23 +11,34 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 # Bibliotecas Externas
+from fastapi import status
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import WebSocket
 from fastapi import WebSocketDisconnect
-from sqlalchemy import text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter()
+router = APIRouter(prefix="/ws", tags=["websockets"])
 
-@router.get("/")
-async def root(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(text("SELECT 'Hello World'"))
-    value = result.scalar()
-    return {"message": value}
+@router.websocket("") # Endpoint padrão
+async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(get_db)):
 
-@router.websocket("/ws")
-async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depends(get_db)):
+    # Decodificando e validando o token:
+    token_data = decode_access_token(token)
+    if token_data is None or token_data.user_id is None:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    result = await db.execute(select(User).where(User.id == token_data.user_id))
+    user = result.scalar_one_or_none()
+    if user is None:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+ 
+    nickname = user.nickname
+
+    # Tentando se conectar ao WebSocket:
     await manager.connect(websocket, nickname)
 
     try:
@@ -49,3 +62,4 @@ async def ws_chat(websocket: WebSocket, nickname: str, db: AsyncSession = Depend
             "content": f"{nickname} saiu do chat",
             "timestamp": datetime.now(timezone.utc).isoformat()
         }))
+

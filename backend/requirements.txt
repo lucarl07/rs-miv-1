@@ -3,3 +3,6 @@ uvicorn[standard]
 sqlalchemy[asyncio]
 aiosqlite
 python-dotenv
+pwdlib[bcrypt]
+python-jose[cryptography]
+email-validator
