@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 # Carregando variáveis de ambiente
 load_dotenv()
-DB_URL = os.getenv("DB_URL")
+DB_URL = os.environ.get("DB_URL", "sqlite+aiosqlite:///./.db/testing.db")
 
 # Objetos para a conexão com o banco de dados
 engine = create_async_engine(
