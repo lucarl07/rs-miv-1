@@ -1,5 +1,6 @@
 # Bibliotecas Nativas
-import os 
+import os
+from typing import AsyncGenerator 
 
 # Bibliotecas do Projeto
 from dotenv import load_dotenv
@@ -22,7 +23,7 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
     
 # Função para efetuar conexão
-async def get_db() -> AsyncSession:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
 
