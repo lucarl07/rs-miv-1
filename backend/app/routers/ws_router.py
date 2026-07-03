@@ -3,7 +3,7 @@ from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
 from app.ws import repository
-from app.ws.manager import manager
+from app.utils.ws_manager import manager
 
 # Bibliotecas Nativas
 import json
