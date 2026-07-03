@@ -2,8 +2,8 @@
 from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
-from app.ws import repository
 from app.utils.ws import ws_manager
+from app.repositories import ws_repo
 
 # Bibliotecas Nativas
 import json
@@ -46,7 +46,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
             data = json.loads(await websocket.receive_text()) 
             content = data["content"]
 
-            message = await repository.save_message(db, nickname, content)
+            message = await ws_repo.save_message(db, nickname, content)
             await ws_manager.broadcast(json.dumps({
                 "id": message.id,
                 "nickname": nickname,
