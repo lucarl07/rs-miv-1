@@ -5,6 +5,8 @@ import { ref, onUnmounted } from 'vue'
 import useAuth from '@/composables/useAuth.ts'
 
 const WS_URL = import.meta.env.VITE_WS_URL
+const HEARTBEAT_INTERVAL_MS = 12000
+const RECONNECT_INTERVAL_MS = 3000
 
 export default function useWebSocket() {
   const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
@@ -12,6 +14,25 @@ export default function useWebSocket() {
 
   let ws = null
   let reconnectTimer = null
+  let heartbeatTimer = null
+
+  function sendRaw(payload) {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(payload))
+    }
+  }
+
+  function startHeartbeat() {
+    stopHeartbeat() // evita duplicar o interval em caso de reconexão
+    heartbeatTimer = setInterval(() => {
+      sendRaw({ type: 'heartbeat' })
+    }, HEARTBEAT_INTERVAL_MS)
+  }
+
+  function stopHeartbeat() {
+    clearInterval(heartbeatTimer)
+    heartbeatTimer = null
+  }
 
   function connect() {
     const { token } = useAuth()
@@ -26,6 +47,7 @@ export default function useWebSocket() {
       status.value = 'connected'
       console.log("Conectado!")
       clearTimeout(reconnectTimer)
+      startHeartbeat()
     }
 
     ws.onmessage = (event) => {
@@ -35,13 +57,14 @@ export default function useWebSocket() {
 
     ws.onclose = () => {
       status.value = 'reconnecting'
-      // Tenta reconectar após 3 segundos
-      reconnectTimer = setTimeout(connect, 3000)
+      stopHeartbeat()
+
+      reconnectTimer = setTimeout(connect, RECONNECT_INTERVAL_MS)
       console.log("Desconectado.")
     }
 
     ws.onerror = () => {
-      ws.close() // dispara onclose, que já cuida da reconexão
+      ws.close()
     }
   }
 
