@@ -4,11 +4,14 @@ import { ref, computed } from "vue";
 // Chamadas à API
 import registerUser from "@/api/registerUser";
 import loginAsUser from "@/api/loginAsUser";
+import { useRouter } from "vue-router";
 
 const TOKEN_KEY = 'access_token'
 const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY))
 
 export default function useAuth() {
+  const router = useRouter()
+
   const isAuthenticated = computed(() => token.value !== null)
 
   async function login(email: string, password: string): Promise<void> {
@@ -27,6 +30,7 @@ export default function useAuth() {
   }
 
   function logout(): void {
+    router.push('/login')
     token.value = null
     sessionStorage.removeItem(TOKEN_KEY)
   }
