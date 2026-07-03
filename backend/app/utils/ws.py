@@ -42,5 +42,5 @@ class ConnectionManager:
         for nickname in dead:
             del self.active_connections[nickname]
 
-manager = ConnectionManager()
+ws_manager = ConnectionManager()
 
