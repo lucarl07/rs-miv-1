@@ -10,12 +10,14 @@ from .db import Base, engine
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.redis = r # 1. Inicializa o Redis
+    app.state.redis = r
     
-    async with engine.begin() as conn: # 2. Sincroniza tabelas do banco de dados
+    async with engine.begin() as conn: 
         await conn.run_sync(Base.metadata.create_all) 
 
-    yield # 3. API fica online aqui
-    
-    await app.state.redis.aclose() # 4. Fecha as conexões Redis de forma segura
+    # API fica online aqui:
+    yield 
+
+    # Fecha as conexões Redis de forma segura:
+    await app.state.redis.aclose() 
 
