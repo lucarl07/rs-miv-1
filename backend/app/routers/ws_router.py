@@ -37,16 +37,23 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
         return
  
     nickname = user.nickname
+    user_id = str(user.id)
 
     # Tentando se conectar ao WebSocket:
-    await ws_manager.connect(websocket, nickname)
+    await ws_manager.connect(websocket, nickname, user_id)
 
+    # Ao estar na conexão WebSocket:
     try:
         while True:
             data = json.loads(await websocket.receive_text()) 
-            content = data["content"]
 
+            if data.get("type") == "heartbeat":
+                await ws_manager.renew_presence(user_id)
+                continue
+
+            content = data["content"]
             message = await ws_repo.save_message(db, nickname, content)
+
             await ws_manager.broadcast(json.dumps({
                 "id": message.id,
                 "nickname": nickname,
@@ -54,8 +61,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }))
     except WebSocketDisconnect:
-        ws_manager.disconnect(websocket, nickname)
-
+        await ws_manager.disconnect(websocket, nickname, user_id)
         await ws_manager.broadcast(json.dumps({
             "id": str(uuid4()),
             "nickname": "%sys%",
