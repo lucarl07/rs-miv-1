@@ -3,7 +3,7 @@ from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
 from app.ws import repository
-from app.utils.ws_manager import manager
+from app.utils.ws import ws_manager
 
 # Bibliotecas Nativas
 import json
@@ -39,7 +39,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
     nickname = user.nickname
 
     # Tentando se conectar ao WebSocket:
-    await manager.connect(websocket, nickname)
+    await ws_manager.connect(websocket, nickname)
 
     try:
         while True:
@@ -47,16 +47,16 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
             content = data["content"]
 
             message = await repository.save_message(db, nickname, content)
-            await manager.broadcast(json.dumps({
+            await ws_manager.broadcast(json.dumps({
                 "id": message.id,
                 "nickname": nickname,
                 "content": content,
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }))
     except WebSocketDisconnect:
-        manager.disconnect(websocket, nickname)
+        ws_manager.disconnect(websocket, nickname)
 
-        await manager.broadcast(json.dumps({
+        await ws_manager.broadcast(json.dumps({
             "id": str(uuid4()),
             "nickname": "%sys%",
             "content": f"{nickname} saiu do chat",
