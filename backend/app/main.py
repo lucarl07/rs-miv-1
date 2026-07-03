@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Módulos do Projeto
 from .conn import lifespan # Inclui DB + Redis
-from .router import router
+from .routers import router
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(router)

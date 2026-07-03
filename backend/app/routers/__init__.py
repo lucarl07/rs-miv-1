@@ -1,6 +1,6 @@
-from .conn.db import get_db
-from .auth.router import router as auth_router
-from .ws.router import router as ws_router
+from app.conn.db import get_db
+from .auth_router import router as auth_router
+from .ws_router import router as ws_router
 
 from fastapi import APIRouter
 from fastapi import Depends
