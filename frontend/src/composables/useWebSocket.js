@@ -7,6 +7,7 @@ import useAuth from '@/composables/useAuth.ts'
 const WS_URL = import.meta.env.VITE_WS_URL
 const HEARTBEAT_INTERVAL_MS = 12000
 const RECONNECT_INTERVAL_MS = 3000
+const INTENTIONAL_DISCONNECT_CODE = 4000
 
 export default function useWebSocket() {
   const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
@@ -45,7 +46,7 @@ export default function useWebSocket() {
 
     ws.onopen = () => {
       status.value = 'connected'
-      console.log("Conectado!")
+      console.log('Conectado!')
       clearTimeout(reconnectTimer)
       startHeartbeat()
     }
@@ -55,12 +56,17 @@ export default function useWebSocket() {
       messages.value.push(payload)
     }
 
-    ws.onclose = () => {
-      status.value = 'reconnecting'
+    ws.onclose = (event) => {
       stopHeartbeat()
 
+      if (event.code === INTENTIONAL_DISCONNECT_CODE) {
+        console.log(`Desconectado (${event.reason}).`)
+        return // Fechamento intencional
+      }
+
+      status.value = 'reconnecting'
       reconnectTimer = setTimeout(connect, RECONNECT_INTERVAL_MS)
-      console.log("Desconectado.")
+      console.log('Desconectado. Tentando reconexão.')
     }
 
     ws.onerror = () => {
@@ -76,7 +82,7 @@ export default function useWebSocket() {
 
   function disconnect() {
     clearTimeout(reconnectTimer)
-    ws?.close()
+    ws?.close(INTENTIONAL_DISCONNECT_CODE, 'logout')
     status.value = 'disconnected'
   }
 
