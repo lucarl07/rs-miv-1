@@ -9,13 +9,15 @@
   import useWebSocket from '@/composables/useWebSocket.js'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
-  const { status, messages, send } = useWebSocket()
+  const { status, messages, send, disconnect } = useWebSocket()
   const { logout } = useAuth()
 
   const handleSend = (content) => send(content)
   const handleLogout = () => {
     const isConfirmed = confirm("Tem certeza de que você deseja sair?")
     if (!isConfirmed) return;
+
+    disconnect()
     logout()
   }
 </script>
