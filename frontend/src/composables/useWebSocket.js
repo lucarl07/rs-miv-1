@@ -75,9 +75,7 @@ export default function useWebSocket() {
   }
 
   function send(content) {
-    if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ content }))
-    }
+    sendRaw({ content })
   }
 
   function disconnect() {
