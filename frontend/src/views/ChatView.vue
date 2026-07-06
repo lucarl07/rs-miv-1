@@ -9,7 +9,7 @@
   import useWebSocket from '@/composables/useWebSocket.js'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
-  const { status, messages, send, disconnect } = useWebSocket()
+  const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { logout } = useAuth()
 
   const handleSend = (content) => send(content)
@@ -42,6 +42,7 @@
     <ChatSidebar
       nickname="nomedocarinhaai"
       :status="status"
+      :userList="onlineUsers"
       class="flex-1 border-s-2 border-s-crushed-berry"
     >
       <template #options>
