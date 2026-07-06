@@ -1,9 +1,9 @@
 # Módulos do Projeto
-from app.db import get_db
+from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
-from app.ws import repository
-from app.ws.manager import manager
+from app.utils.ws import ws_manager
+from app.repositories import ws_repo
 
 # Bibliotecas Nativas
 import json
@@ -37,26 +37,32 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
         return
  
     nickname = user.nickname
+    user_id = str(user.id)
 
     # Tentando se conectar ao WebSocket:
-    await manager.connect(websocket, nickname)
+    await ws_manager.connect(websocket, nickname, user_id)
 
+    # Ao estar na conexão WebSocket:
     try:
         while True:
             data = json.loads(await websocket.receive_text()) 
-            content = data["content"]
 
-            message = await repository.save_message(db, nickname, content)
-            await manager.broadcast(json.dumps({
+            if data.get("type") == "heartbeat":
+                await ws_manager.renew_presence(user_id)
+                continue
+
+            content = data["content"]
+            message = await ws_repo.save_message(db, nickname, content)
+
+            await ws_manager.broadcast(json.dumps({
                 "id": message.id,
                 "nickname": nickname,
                 "content": content,
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }))
     except WebSocketDisconnect:
-        manager.disconnect(websocket, nickname)
-
-        await manager.broadcast(json.dumps({
+        await ws_manager.disconnect(websocket, nickname, user_id)
+        await ws_manager.broadcast(json.dumps({
             "id": str(uuid4()),
             "nickname": "%sys%",
             "content": f"{nickname} saiu do chat",

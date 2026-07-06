@@ -42,8 +42,9 @@ export default function formatDate(date: Date): string {
   const msgDay = new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
   // Comparando os dias de calendário 'today' e 'msgDay' pelo número de milissegundos em um dia
+  const MS_IN_DAY = 86_400_000
   const diffDays = Math.floor(
-    (today.getTime() - msgDay.getTime()) / 86_400_000
+    (today.getTime() - msgDay.getTime()) / MS_IN_DAY
   )
 
   // Obtendo a formatação que deve ser utilizada, com base no tamanho da diferença das datas em dias
