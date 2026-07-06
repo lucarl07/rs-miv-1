@@ -12,6 +12,7 @@ const INTENTIONAL_DISCONNECT_CODE = 4000
 export default function useWebSocket() {
   const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
   const messages = ref([])
+  const onlineUsers = ref([])
 
   let ws = null
   let reconnectTimer = null
@@ -59,7 +60,18 @@ export default function useWebSocket() {
         return
       }
 
-      messages.value.push(payload)
+      if (payload.type === 'connection' && payload.event === 'join'
+        && !onlineUsers.value.includes(payload.nickname)
+        // ↑ Evita duplicidade ao receber uma mensagem de join duplicada
+      ) {
+        onlineUsers.value.push(payload.nickname)
+      }
+
+      if (payload.type === 'connection' && payload.event === 'leave') {
+        onlineUsers.value = onlineUsers.value.filter(u => u !== payload.nickname)
+      }
+
+      messages.value.push(payload.data)
     }
 
     ws.onclose = (event) => {
@@ -94,5 +106,5 @@ export default function useWebSocket() {
 
   connect() // inicia ao montar o componente que usa o composable
 
-  return { status, messages, send, disconnect }
+  return { status, messages, onlineUsers, send, disconnect }
 }

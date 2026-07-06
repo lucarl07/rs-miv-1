@@ -55,17 +55,26 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
             message = await ws_repo.save_message(db, nickname, content)
 
             await ws_manager.broadcast(json.dumps({
-                "id": message.id,
-                "nickname": nickname,
-                "content": content,
-                "timestamp": datetime.now(timezone.utc).isoformat()
+                "type": "message",
+                "data": {
+                    "id": message.id,
+                    "nickname": nickname,
+                    "content": content,
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                }
             }))
     except WebSocketDisconnect:
         await ws_manager.disconnect(websocket, nickname, user_id)
+
         await ws_manager.broadcast(json.dumps({
-            "id": str(uuid4()),
-            "nickname": "%sys%",
-            "content": f"{nickname} saiu do chat",
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "type": "connection",
+            "event": "leave",
+            "nickname": nickname,
+            "data": {
+                "id": str(uuid4()),
+                "nickname": "Mensagem do sistema",
+                "content": f"{nickname} saiu do chat",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
         }))
 

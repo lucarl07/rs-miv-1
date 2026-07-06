@@ -27,16 +27,10 @@
     <main class="flex flex-col flex-3">
       <ol class="flex flex-col overflow-y-auto mx-10 mt-10 h-full">
         <li v-for="(message, index) in messages" :key="message.id" >
-          <Message v-if="message.nickname !== '%sys%'"
+          <Message
             :username="message.nickname"
             :content="message.content"
             :timestamp="message.timestamp"
-            />
-          <Message v-else
-            username="Mensagem do sistema"
-            :content="message.content"
-            :timestamp="message.timestamp"
-            :isSystemMessage="true"
             />
         </li>
       </ol>

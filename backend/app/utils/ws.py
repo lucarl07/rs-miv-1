@@ -34,10 +34,15 @@ class ConnectionManager:
         }))
 
         await self.broadcast(json.dumps({
-            "id": str(uuid4()),
-            "nickname": "%sys%",
-            "content": f"{nickname} entrou no chat",
-            "timestamp": datetime.now(timezone.utc).isoformat()
+            "type": "connection",
+            "event": "join",
+            "nickname": nickname,
+            "data": {
+                "id": str(uuid4()),
+                "nickname": "Mensagem do sistema",
+                "content": f"{nickname} entrou no chat",
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
         }))
 
     async def disconnect(self, websocket: WebSocket, nickname: str, user_id: str):
