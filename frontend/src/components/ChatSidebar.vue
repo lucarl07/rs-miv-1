@@ -2,6 +2,7 @@
   const props = defineProps<{
     nickname: string
     status: string
+    userList: string[]
   }>();
 </script>
 
@@ -20,6 +21,13 @@
       </div>
     </header>
     <hr class="text-crushed-berry" />
+    <ul>
+      <li v-for="(user, index) in userList" :key="index">
+        {{user}}
+      </li>
+    </ul>
+    <hr class="text-crushed-berry" />
+    <!-- Ainda vou ver o que faço com isso aqui ↓ -->
     <a href="https://www.flaticon.com/free-icons/leave" title="leave icons">Leave icons created by meaicon - Flaticon</a>
   </aside>
 </template>

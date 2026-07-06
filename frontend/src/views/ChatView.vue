@@ -9,7 +9,7 @@
   import useWebSocket from '@/composables/useWebSocket.js'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
-  const { status, messages, send, disconnect } = useWebSocket()
+  const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { logout } = useAuth()
 
   const handleSend = (content) => send(content)
@@ -27,16 +27,10 @@
     <main class="flex flex-col flex-3">
       <ol class="flex flex-col overflow-y-auto mx-10 mt-10 h-full">
         <li v-for="(message, index) in messages" :key="message.id" >
-          <Message v-if="message.nickname !== '%sys%'"
+          <Message
             :username="message.nickname"
             :content="message.content"
             :timestamp="message.timestamp"
-            />
-          <Message v-else
-            username="Mensagem do sistema"
-            :content="message.content"
-            :timestamp="message.timestamp"
-            :isSystemMessage="true"
             />
         </li>
       </ol>
@@ -48,6 +42,7 @@
     <ChatSidebar
       nickname="nomedocarinhaai"
       :status="status"
+      :userList="onlineUsers"
       class="flex-1 border-s-2 border-s-crushed-berry"
     >
       <template #options>
