@@ -53,6 +53,12 @@ export default function useWebSocket() {
 
     ws.onmessage = (event) => {
       const payload = JSON.parse(event.data)
+
+      if (payload.type === 'online_users') {
+        onlineUsers.value = payload.users
+        return
+      }
+
       messages.value.push(payload)
     }
 

@@ -25,6 +25,14 @@ class ConnectionManager:
         self.active_connections[nickname] = websocket
         await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
 
+        keys = [key async for key in r.scan_iter(match="presence:*")]
+        online_nicknames = await r.mget(keys) if keys else []
+
+        await websocket.send_text(json.dumps({
+            "type": "online_users",
+            "users": online_nicknames
+        }))
+
         await self.broadcast(json.dumps({
             "id": str(uuid4()),
             "nickname": "%sys%",
