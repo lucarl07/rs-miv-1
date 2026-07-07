@@ -57,7 +57,14 @@ export default function useWebSocket() {
 
       if (payload.type === 'online_users') {
         onlineUsers.value = payload.users
-        return
+        return // Retorna por não enviar nada visível no chat em si.
+      }
+
+      if (payload.type === 'message_history') {
+        for (const _payload of payload.messages) {
+          messages.value.push(_payload.data)
+        }
+        return // Retorna, pois já readiciona todas as mensagens recebidas no chat.
       }
 
       if (payload.type === 'connection' && payload.event === 'join'
