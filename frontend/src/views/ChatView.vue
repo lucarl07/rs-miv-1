@@ -7,10 +7,12 @@
 
   import useAuth from '@/composables/useAuth.ts'
   import useWebSocket from '@/composables/useWebSocket.js'
+  import useAutoScroll from '@/composables/useAutoScroll.ts'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
   const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { logout } = useAuth()
+  const { scrollTarget } = useAutoScroll(messages.value, () => true)
 
   const handleSend = (content) => send(content)
   const handleLogout = () => {
@@ -25,7 +27,7 @@
 <template>
   <div class="flex flex-row flex-1 overflow-hidden">
     <main class="flex flex-col flex-3">
-      <ol class="flex flex-col overflow-y-auto mx-10 mt-10 h-full">
+      <ol ref="scrollTarget" class="flex flex-col overflow-y-auto mx-10 mt-10 h-full">
         <li v-for="(message, index) in messages" :key="message.id" >
           <Message
             :username="message.nickname"
