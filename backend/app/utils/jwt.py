@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 
 # Configuração 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 960 # 16 horas 
 
 try:
     SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
