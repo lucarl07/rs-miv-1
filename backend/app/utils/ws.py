@@ -1,13 +1,18 @@
 # Bibliotecas Nativas
 import json
+import logging
 from uuid import uuid4
 from datetime import datetime, timezone
 
 # Bibliotecas Externas
 from fastapi import WebSocket
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Módulos do Projeto
 from app.conn.redis import r
+from app.repositories.message import get_last_n_messages
+
+logger = logging.getLogger(__name__)
 
 PRESENCE_TTL = 30 # segundos
 
@@ -15,7 +20,7 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[str, WebSocket] = {}
 
-    async def connect(self, websocket: WebSocket, nickname: str, user_id: str):
+    async def connect(self, websocket: WebSocket, nickname: str, user_id: str, db: AsyncSession):
         await websocket.accept()
 
         old = self.active_connections.get(nickname)
@@ -33,7 +38,25 @@ class ConnectionManager:
             "users": online_nicknames
         }))
 
-        await self.broadcast(json.dumps({
+        # Tenta buscar histórico de mensagens no Redis...
+        try:
+            cached = await r.lrange("chat:global:messages", 0, -1)
+        except Exception as e:
+            logger.warning(f"Failed to read Redis message cache: {e}")
+            cached = []
+
+        # ...se não, tenta obtê-lo do banco de dados.
+        if cached:
+            messages = [json.loads(m) for m in reversed(cached)]
+        else:
+            messages = await get_last_n_messages(db, n=100)
+
+        await websocket.send_text(json.dumps({
+            "type": "message_history",
+            "messages": messages
+        }))
+
+        await self.broadcast({
             "type": "connection",
             "event": "join",
             "nickname": nickname,
@@ -43,7 +66,7 @@ class ConnectionManager:
                 "content": f"{nickname} entrou no chat",
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
-        }))
+        })
 
     async def disconnect(self, websocket: WebSocket, nickname: str, user_id: str):
         if self.active_connections.get(nickname) is websocket:
@@ -54,17 +77,25 @@ class ConnectionManager:
     async def renew_presence(self, user_id: str):
         await r.expire(f"presence:{user_id}", PRESENCE_TTL)
 
-    async def broadcast(self, content: str):
+    async def broadcast(self, message_payload: dict):
         dead = []
+        str_message_payload = json.dumps(message_payload)
 
         for nickname, connection in self.active_connections.items():
             try:
-                await connection.send_text(content)
+                await connection.send_text(str_message_payload)
             except Exception:
                 dead.append(nickname)
 
         for nickname in dead:
             del self.active_connections[nickname]
+
+        if message_payload.get("type") == "message":
+            try:
+                await r.lpush("chat:global:messages", str_message_payload)
+                await r.ltrim("chat:global:messages", 0, 99)
+            except Exception as e:
+                logger.warning(f"Failed to update Redis cache: {e}")
 
 ws_manager = ConnectionManager()
 

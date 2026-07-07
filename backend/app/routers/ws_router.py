@@ -3,7 +3,7 @@ from app.conn.db import get_db
 from app.models.user import User
 from app.utils.jwt import decode_access_token
 from app.utils.ws import ws_manager
-from app.repositories import ws_repo
+from app.repositories.message import save_message
 
 # Bibliotecas Nativas
 import json
@@ -40,7 +40,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
     user_id = str(user.id)
 
     # Tentando se conectar ao WebSocket:
-    await ws_manager.connect(websocket, nickname, user_id)
+    await ws_manager.connect(websocket, nickname, user_id, db)
 
     # Ao estar na conexão WebSocket:
     try:
@@ -52,9 +52,9 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
                 continue
 
             content = data["content"]
-            message = await ws_repo.save_message(db, nickname, content)
+            message = await save_message(db, nickname, content)
 
-            await ws_manager.broadcast(json.dumps({
+            await ws_manager.broadcast({
                 "type": "message",
                 "data": {
                     "id": message.id,
@@ -62,11 +62,11 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
                     "content": content,
                     "timestamp": datetime.now(timezone.utc).isoformat()
                 }
-            }))
+            })
     except WebSocketDisconnect:
         await ws_manager.disconnect(websocket, nickname, user_id)
 
-        await ws_manager.broadcast(json.dumps({
+        await ws_manager.broadcast({
             "type": "connection",
             "event": "leave",
             "nickname": nickname,
@@ -76,5 +76,5 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
                 "content": f"{nickname} saiu do chat",
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }
-        }))
+        })
 
