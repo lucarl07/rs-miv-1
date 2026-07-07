@@ -6,3 +6,4 @@ async def save_message(db: AsyncSession, nickname: str, content: str) -> Message
     db.add(message)
     await db.commit()
     return message;
+
