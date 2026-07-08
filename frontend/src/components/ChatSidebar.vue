@@ -1,16 +1,21 @@
 <script setup lang="ts">
+  import { computed } from 'vue'
+
   const props = defineProps<{
-    nickname: string
+    nickname?: string
     status: string
     userList: string[]
   }>();
+
+  const isNicknameLoaded = computed<boolean>(() => props.nickname)
 </script>
 
 <template>
   <aside class="flex flex-col px-6 py-4 gap-4">
     <header class="flex flex-row justify-between items-center">
       <hgroup>
-        <h2 class="text-lg">{{nickname}}</h2>
+        <h2 v-if="isNicknameLoaded" class="text-lg">{{nickname}}</h2>
+        <h2 v-else class="text-lg text-gray-400">Carregando...</h2>
         <p class="text-sm">
           <span class="font-bold">Status:</span>
           {{status}}
