@@ -33,3 +33,10 @@ interface SignupFormErrors {
   other: string | null
 }
 
+interface CurrentUserResponse {
+  id: string
+  nickname: string
+  email: string
+  created_at: any
+}
+
