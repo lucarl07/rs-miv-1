@@ -40,3 +40,4 @@ interface CurrentUserResponse {
   created_at: any
 }
 
+interface CurrentUserInfo extends CurrentUserResponse {}
