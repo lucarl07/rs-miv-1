@@ -50,4 +50,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     """Payload decodificado do JWT, usado internamente para identificar o usuário autenticado."""
 
-    user_id: str | None = None
+    user_id: str 
+
+
