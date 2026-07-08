@@ -15,7 +15,7 @@
     <header class="flex flex-row justify-between items-center">
       <hgroup>
         <h2 v-if="isNicknameLoaded" class="text-lg">{{nickname}}</h2>
-        <h2 v-else class="text-lg text-gray-400">Carregando...</h2>
+        <h2 v-else class="text-lg text-gray-400">Carregando...</h2> <!-- TODO: Trocar esse <h2> por uma <div> -->
         <p class="text-sm">
           <span class="font-bold">Status:</span>
           {{status}}
