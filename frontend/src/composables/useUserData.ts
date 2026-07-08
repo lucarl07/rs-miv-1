@@ -1,21 +1,30 @@
 // Dependências Externas
 import { ref, computed } from "vue";
 
+// Módulos do cliente:
+import useAuth from "./useAuth";
+
 // Chamadas à API
 import getCurrentUser from "@/api/getCurrentUser";
-
-const TOKEN_KEY = 'access_token'
-const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY))
 
 interface Options {
   loadOnStartup?: boolean
 }
 
-export default function useUserData({ loadOnStartup = false }: Options) {
+export default function useUserData({ loadOnStartup = false }: Options = {}) {
+  const { token } = useAuth()
   const userData = ref<CurrentUserInfo | null>(null)
+  const loadingError = ref<string | null>(null)
 
   async function loadUserData() {
-    userData.value = await getCurrentUser(token.value)
+    if (!token.value) return
+    try {
+      userData.value = await getCurrentUser(token.value)
+    } catch (e) {
+      loadingError.value = e instanceof Error
+        ? e.message
+        : 'Erro desconhecido.'
+    }
   }
 
   const nickname = computed(() => userData.value?.nickname)
@@ -24,5 +33,6 @@ export default function useUserData({ loadOnStartup = false }: Options) {
     loadUserData()
   }
 
-  return { loadUserData, userData, nickname }
+  return { loadUserData, loadingError, userData, nickname }
 }
+
