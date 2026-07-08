@@ -5,12 +5,15 @@
   import MessageInput from '@/components/MessageInput.vue'
   import ChatSidebar from '@/components/ChatSidebar.vue'
 
+  import useUserData from '@/composables/useUserData.ts'
   import useAuth from '@/composables/useAuth.ts'
   import useWebSocket from '@/composables/useWebSocket.js'
   import useAutoScroll from '@/composables/useAutoScroll.ts'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
   const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
+  const { nickname } = useUserData({ loadOnStartup: true })
+
   const { logout } = useAuth()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
 
@@ -42,7 +45,7 @@
       />
     </main>
     <ChatSidebar
-      nickname="nomedocarinhaai"
+      :nickname="nickname"
       :status="status"
       :userList="onlineUsers"
       class="flex-1 border-s-2 border-s-crushed-berry"
