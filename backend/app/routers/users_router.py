@@ -32,4 +32,11 @@ async def get_current_user(
         )
 
     current_user = await get_user_by_id(db, token_data.user_id)
+
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credencial de acesso inválida e/ou expirada."
+        )
+
     return current_user

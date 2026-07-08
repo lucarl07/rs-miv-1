@@ -10,5 +10,5 @@ async def get_user_by_id(db: AsyncSession, user_id: str) -> User:
         select(User)
         .where(User.id == user_id)
     )
-    user = result.scalar_one()
+    user = result.scalar_one_or_none()
     return user
