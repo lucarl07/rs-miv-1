@@ -7,7 +7,7 @@
     userList: string[]
   }>();
 
-  const isNicknameLoaded = computed<boolean>(() => props.nickname)
+  const isNicknameLoaded = computed<boolean>(() => !!props.nickname)
 </script>
 
 <template>
@@ -33,6 +33,8 @@
     </ul>
     <hr class="text-crushed-berry" />
     <!-- Ainda vou ver o que faço com isso aqui ↓ -->
-    <a href="https://www.flaticon.com/free-icons/leave" title="leave icons">Leave icons created by meaicon - Flaticon</a>
+    <a href="https://www.flaticon.com/free-icons/leave" title="leave icons">
+      Leave icons created by meaicon - Flaticon
+    </a>
   </aside>
 </template>
