@@ -22,15 +22,8 @@ class UserCreate(BaseModel):
         return v
 
 
-class UserLogin(BaseModel):
-    """Schema de entrada para o login."""
-
-    email: EmailStr
-    password: str
-
-
 class UserOut(BaseModel):
-    """Schema de saída pública."""
+    """Schema de saída pós-registro."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -38,6 +31,19 @@ class UserOut(BaseModel):
     nickname: str
     email: EmailStr
     created_at: datetime
+
+
+class UserLogin(BaseModel):
+    """Schema de entrada para o login."""
+
+    email: EmailStr
+    password: str
+
+
+class UserPublic(UserOut):
+    """Schema de saída pública."""
+
+    # Nada a declarar, por ora.
 
 
 class Token(BaseModel):
