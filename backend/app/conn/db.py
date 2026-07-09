@@ -11,13 +11,15 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 # Carregando variáveis de ambiente
 load_dotenv()
+
 DB_URL = os.environ.get("DB_URL", "sqlite+aiosqlite:///./.db/testing.db")
+DB_ECHO = os.environ.get("DB_ECHO", '0').strip().lower() in ('1', 'true', 'yes')
 
 # Objetos para a conexão com o banco de dados
 engine = create_async_engine(
     DB_URL, 
     connect_args={"check_same_thread": False}, 
-    echo=True # Por enquanto, apenas para debugar
+    echo=DB_ECHO
 )
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 Base = declarative_base()
