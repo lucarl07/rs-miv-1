@@ -6,7 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, field_validator, field_serializer
 
 # Módulos do Sistema
-from app.utils.sanitization import msg_cleaner
+from app.utils.sanitization import msg_sanitizer
 
 
 class IncomingMessage(BaseModel):
@@ -18,7 +18,7 @@ class IncomingMessage(BaseModel):
     @field_validator("content")
     @classmethod
     def sanitize_content(cls, v: str) -> str:
-        sv = msg_cleaner.clean(v)
+        sv = msg_sanitizer.clean(v)
         return sv
 
 
