@@ -1,4 +1,5 @@
 # Bibliotecas Nativas
+import email
 from typing import Literal
 
 # Bibliotecas Externas
@@ -10,6 +11,12 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 from app.utils.pw_hashing import hash_password 
 
+# Funções Internas
+async def _get_user_by_field(db: AsyncSession, field, value: str) -> User | None:
+    result = await db.execute(select(User).where(field == value))
+    return result.scalar_one_or_none()
+
+# Funções Públicas
 async def check_if_user_creds_exist(db: AsyncSession, nickname: str, email: str) -> bool:
     """Verifica se as credenciais fornecidas já estão sendo usadas
     por outro usuário."""
@@ -47,24 +54,9 @@ async def get_user_by_id(db: AsyncSession, user_id: str) -> User:
     user = result.scalar_one_or_none()
     return user
 
-async def get_user_by_unique(
-    db: AsyncSession, value: str, fieldname: Literal['nickname', 'email']
-) -> User:
-    """Retorna o usuário com base em um atributo único que não seja
-    seu identificador - ou seja, aceita ou 'nickname' ou 'email'."""
+async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
+    return await _get_user_by_field(db, User.email, email)
 
-    if fieldname.strip().lower() == 'nickname':
-        field = User.nickname
-    elif fieldname.strip().lower() == 'email':
-        field = User.email
-    else:
-        raise ValueError(f'''
-            Nome de campo único do usuário "{fieldname}" não existente.
-        ''')
-
-    result = await db.execute(
-        select(User).where(field == value)
-    )
-    user = result.scalar_one_or_none()
-    return user
+async def get_user_by_nickname(db: AsyncSession, nickname: str) -> User | None:
+    return await _get_user_by_field(db, User.nickname, nickname)
 

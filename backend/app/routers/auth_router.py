@@ -1,14 +1,13 @@
 # Módulos da Aplicação
 from app.conn.db import get_db
 from app.models.user import User
-from app.repositories.user import check_if_user_creds_exist, create_new_user, get_user_by_unique
+from app.repositories.user import check_if_user_creds_exist, create_new_user, get_user_by_email
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 from app.utils.jwt import create_access_token
 from app.utils.pw_hashing import verify_password
 
 # Bibliotecas Externas
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -33,7 +32,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) ->
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     """Realiza o login na conta de um usuário, atribuindo a ele um JWT de acesso."""
 
-    user = await get_user_by_unique(db, user_data.email, 'email')
+    user = await get_user_by_email(db, user_data.email)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
