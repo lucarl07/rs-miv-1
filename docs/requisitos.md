@@ -13,8 +13,8 @@ Glossário:
 - X = Concluído (no escopo geral da aplicação).
 
 ### GESTÃO DE CONEXÃO E IDENTIFICAÇÃO:
-- [ ] **Cadastro e Autenticação:** Todos os usuários na plataforma devem estar registrados em uma conta com nome/apelido, email e senha.
-- [ ] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido único do usuário for definido.
+- [X] **Cadastro e Autenticação:** Todos os usuários na plataforma devem estar registrados em uma conta com nome/apelido, email e senha.
+- [X] **Canal Global:** Os usuários serão conectados automaticamente ao canal global assim que o apelido único do usuário for definido.
 - [X] **Notificação de Presença:** O sistema deve exibir uma mensagem automática para todos os usuários informando quando um novo participante entrou ou saiu do chat.
 
 ### MENSAGERIA EM TEMPO REAL:
@@ -35,12 +35,12 @@ Glossário:
 
 ## Requisitos Não Funcionais
 
-- [ ] **Entrega de mensagens em tempo real:** Idealmente <=200ms em uma rede local estável.
-- [ ] **Persistência de Conexão:** Através da WebSocket API nativa do navegador.
-- [ ] **Feedback de Estado:** O usuário deve saber se está "Conectado" ou "Desconectado"
+- [X] **Entrega de mensagens em tempo real:** Idealmente <=200ms em uma rede local estável.
+- [X] **Persistência de Conexão:** Através da WebSocket API nativa do navegador.
+- [X] **Feedback de Estado:** O usuário deve saber se está "Conectado" ou "Desconectado"
 - [ ] **Sanitização de Dados:** Impedir o envio de códigos maliciosos (ex.: `<script>`) que execute em outro navegador (proteção contra XSS).
 - [ ] **Criptografia E2E:** O sistema deve implementar criptografia end-to-end através de pares de chaves PGP.
-- [ ] **Autenticação segura:** Autenticação realizada através de JSON Web Tokens e OAuth 2.0.
-- [ ] **Modularidade:** Separar claramente a lógica do servidor da lógica do cliente.
+- [~] **Autenticação segura:** Autenticação realizada através de JSON Web Tokens e OAuth 2.0.
+- [X] **Modularidade:** Separar claramente a lógica do servidor da lógica do cliente.
 - [ ] **Responsividade:** Deve funcionar minimamente bem tanto no desktop quanto no celular.
 - [ ] **Indicadores Visuais:** Diferenciação clara entre mensagens enviadas e recebidas.
