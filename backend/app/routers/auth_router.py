@@ -1,6 +1,7 @@
 # Módulos da Aplicação
 from app.conn.db import get_db
 from app.models.user import User
+from app.repositories.user import check_if_user_creds_exist
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 from app.utils.jwt import create_access_token
 from app.utils.pw_hashing import hash_password, verify_password
@@ -16,12 +17,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) -> User:
     """Registra um novo usuário, validando unicidade de nickname e email."""
 
-    existing = await db.execute(
-        select(User).where(
-            (User.nickname == user_data.nickname) | (User.email == user_data.email)
-        )
-    )
-    if existing.scalar_one_or_none() is not None:
+    are_user_credentials_used = await check_if_user_creds_exist(
+        db, user_data.nickname, user_data.email
+    )    
+    if are_user_credentials_used is True:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Nickname ou email já cadastrado.",
