@@ -1,10 +1,10 @@
 # Módulos da Aplicação
 from app.conn.db import get_db
 from app.models.user import User
-from app.repositories.user import check_if_user_creds_exist
+from app.repositories.user import check_if_user_creds_exist, create_new_user
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 from app.utils.jwt import create_access_token
-from app.utils.pw_hashing import hash_password, verify_password
+from app.utils.pw_hashing import verify_password
 
 # Bibliotecas Externas
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -26,20 +26,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) ->
             detail="Nickname ou email já cadastrado.",
         )
 
-    new_user = User(
-        nickname=user_data.nickname,
-        email=user_data.email,
-        hashed_password=hash_password(
-            user_data.password.get_secret_value()
-        ),
-    )
-
-    db.add(new_user)
-    await db.commit()
-
-    # No momento, não há utilidade prática em retornar o usuário, 
-    # porém isso será mantido como boa prática.
-    await db.refresh(new_user)
+    new_user = await create_new_user(db, user_data)
     return new_user
 
 @router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)

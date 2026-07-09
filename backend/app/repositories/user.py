@@ -4,6 +4,8 @@ from sqlalchemy import select
 
 # Módulos do Projeto
 from app.models.user import User
+from app.schemas.user import UserCreate
+from app.utils.pw_hashing import hash_password 
 
 async def check_if_user_creds_exist(db: AsyncSession, nickname: str, email: str) -> bool:
     """Verifica se as credenciais fornecidas já estão sendo usadas
@@ -19,6 +21,20 @@ async def check_if_user_creds_exist(db: AsyncSession, nickname: str, email: str)
         return True
 
     return False
+
+async def create_new_user(db: AsyncSession, data: UserCreate) -> User:
+    new_user = User(
+        nickname=data.nickname,
+        email=data.email,
+        hashed_password=hash_password(
+            data.password.get_secret_value()
+        ),
+    )
+
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    return new_user
 
 async def get_user_by_id(db: AsyncSession, user_id: str) -> User:
     result = await db.execute(
