@@ -1,6 +1,7 @@
 # Módulos do Projeto
 from app.conn.db import get_db
 from app.models.user import User
+from app.schemas.message import ChatMessagePayload, IncomingMessage, MessageData
 from app.utils.jwt import decode_access_token
 from app.utils.ws import ws_manager
 from app.repositories.message import save_message
@@ -50,19 +51,21 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
             if data.get("type") == "heartbeat":
                 await ws_manager.renew_presence(user_id)
                 continue
+            
+            clean_msg = IncomingMessage(**data)
+            stored_msg = await save_message(db, nickname, clean_msg.content)
 
-            content = data["content"]
-            message = await save_message(db, nickname, content)
-
-            await ws_manager.broadcast({
-                "type": "message",
-                "data": {
-                    "id": message.id,
-                    "nickname": nickname,
-                    "content": content,
-                    "timestamp": datetime.now(timezone.utc).isoformat()
-                }
-            })
+            await ws_manager.broadcast(
+                ChatMessagePayload(
+                    type='message',
+                    data=MessageData(
+                        id=stored_msg.id,
+                        nickname=stored_msg.nickname,
+                        content=stored_msg.content,
+                        timestamp=stored_msg.timestamp
+                    )
+                ).model_dump()
+            )
     except WebSocketDisconnect:
         await ws_manager.disconnect(websocket, nickname, user_id)
 
