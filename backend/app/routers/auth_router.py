@@ -1,7 +1,7 @@
 # Módulos da Aplicação
 from app.conn.db import get_db
 from app.models.user import User
-from app.repositories.user import check_if_user_creds_exist, create_new_user
+from app.repositories.user import check_if_user_creds_exist, create_new_user, get_user_by_unique
 from app.schemas.user import Token, UserCreate, UserLogin, UserOut
 from app.utils.jwt import create_access_token
 from app.utils.pw_hashing import verify_password
@@ -33,17 +33,13 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) ->
 async def login(user_data: UserLogin, db: AsyncSession = Depends(get_db)):
     """Realiza o login na conta de um usuário, atribuindo a ele um JWT de acesso."""
 
-    result = await db.execute(
-        select(User).where(User.email == user_data.email)
-    )
-
-    user = result.scalar_one_or_none() 
+    user = await get_user_by_unique(db, user_data.email, 'email')
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-mail ou senha incorretos."
         )
-    
+
     passwords_match = verify_password(user_data.password, user.hashed_password)
     if not passwords_match:
         raise HTTPException(

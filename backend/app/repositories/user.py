@@ -1,3 +1,6 @@
+# Bibliotecas Nativas
+from typing import Literal
+
 # Bibliotecas Externas
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -40,6 +43,27 @@ async def get_user_by_id(db: AsyncSession, user_id: str) -> User:
     result = await db.execute(
         select(User)
         .where(User.id == user_id)
+    )
+    user = result.scalar_one_or_none()
+    return user
+
+async def get_user_by_unique(
+    db: AsyncSession, value: str, fieldname: Literal['nickname', 'email']
+) -> User:
+    """Retorna o usuário com base em um atributo único que não seja
+    seu identificador - ou seja, aceita ou 'nickname' ou 'email'."""
+
+    if fieldname.strip().lower() == 'nickname':
+        field = User.nickname
+    elif fieldname.strip().lower() == 'email':
+        field = User.email
+    else:
+        raise ValueError(f'''
+            Nome de campo único do usuário "{fieldname}" não existente.
+        ''')
+
+    result = await db.execute(
+        select(User).where(field == value)
     )
     user = result.scalar_one_or_none()
     return user
