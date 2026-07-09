@@ -46,13 +46,8 @@ async def create_new_user(db: AsyncSession, data: UserCreate) -> User:
     await db.refresh(new_user)
     return new_user
 
-async def get_user_by_id(db: AsyncSession, user_id: str) -> User:
-    result = await db.execute(
-        select(User)
-        .where(User.id == user_id)
-    )
-    user = result.scalar_one_or_none()
-    return user
+async def get_user_by_id(db: AsyncSession, user_id: str) -> User | None:
+    return await _get_user_by_field(db, User.id, user_id)
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
     return await _get_user_by_field(db, User.email, email)
