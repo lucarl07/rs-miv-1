@@ -32,8 +32,8 @@ class MessageData(BaseModel):
     timestamp: datetime
 
     @field_serializer("timestamp")
-    def serialize_timestamp(self, value: datetime) -> str:
-        return value.isoformat()
+    def serialize_timestamp(self, v: datetime) -> str:
+        return v.isoformat()
 
 
 class ChatMessagePayload(BaseModel):
