@@ -1,5 +1,13 @@
 import re
 
+def check_nickname_validity(nickname: str) -> None:
+    NICKNAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{5,30}$")
+
+    if not NICKNAME_PATTERN.match(nickname):
+        raise ValueError(
+            "Nickname deve conter apenas letras, números, '_' ou '-', entre 5 e 30 caracteres."
+        )
+
 def check_pw_validity(password: str) -> None:
     """Verifica os requisitos da senha e lança um erro específico se falhar."""
     
