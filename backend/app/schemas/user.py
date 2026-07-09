@@ -10,7 +10,7 @@ from app.utils.data_validation import check_pw_validity
 class UserCreate(BaseModel):
     """Schema de entrada para o registro de um novo usuário."""
 
-    nickname: str = Field(min_length=3, max_length=50)
+    nickname: str = Field(min_length=5, max_length=30)
     email: EmailStr
     password: SecretStr = Field() # Toda validação ocorre no field validator
 
