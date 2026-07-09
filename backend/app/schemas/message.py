@@ -3,7 +3,7 @@ from typing import Literal
 from datetime import datetime
 
 # Bibliotecas Externas
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, field_serializer
 
 # Módulos do Sistema
 from app.utils.sanitization import msg_cleaner
@@ -28,8 +28,13 @@ class MessageData(BaseModel):
 
     id: str
     nickname: str
-    content: str
+    content: str 
     timestamp: datetime
+
+    @field_serializer("timestamp")
+    def serialize_timestamp(self, value: datetime) -> str:
+        return value.isoformat()
+
 
 class ChatMessagePayload(BaseModel):
     """Schema completo de uma mensagem de chat, incluindo seus dados 
@@ -37,3 +42,5 @@ class ChatMessagePayload(BaseModel):
 
     type: Literal["message"]
     data: MessageData
+
+
