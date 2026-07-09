@@ -5,14 +5,20 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, ConfigDict, Field, SecretStr, field_validator
 
 # Módulos do Sistema
-from app.utils.data_validation import check_pw_validity
+from app.utils.data_validation import check_nickname_validity, check_pw_validity
 
 class UserCreate(BaseModel):
     """Schema de entrada para o registro de um novo usuário."""
 
-    nickname: str = Field(min_length=3, max_length=50)
+    nickname: str = Field(min_length=5, max_length=30)
     email: EmailStr
-    password: SecretStr = Field() # Toda validação ocorre no field validator
+    password: SecretStr = Field(min_length=8) 
+
+    @field_validator('nickname')
+    @classmethod
+    def validate_nickname(cls, v: str) -> str:
+        check_nickname_validity(v)
+        return v
 
     @field_validator("password")
     @classmethod

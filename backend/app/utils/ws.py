@@ -90,7 +90,8 @@ class ConnectionManager:
         for nickname in dead:
             del self.active_connections[nickname]
 
-        if message_payload.get("type") == "message":
+        # Não vou mudar o tipo de message_payload por causa dessa bomba aqui:
+        if message_payload.get("type") == "message": 
             try:
                 await r.lpush("chat:global:messages", str_message_payload)
                 await r.ltrim("chat:global:messages", 0, 99)
