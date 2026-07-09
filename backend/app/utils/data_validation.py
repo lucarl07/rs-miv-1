@@ -1,27 +1,35 @@
 import re
+import string
 
 def check_nickname_validity(nickname: str) -> None:
     NICKNAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{5,30}$")
 
     if not NICKNAME_PATTERN.match(nickname):
-        raise ValueError(
-            "Nickname deve conter apenas letras, números, '_' ou '-', entre 5 e 30 caracteres."
-        )
+        raise ValueError("""
+            Nickname deve conter apenas letras, números, '_' ou '-', entre
+            5 e 30 caracteres.
+        """)
 
 def check_pw_validity(password: str) -> None:
-    """Verifica os requisitos da senha e lança um erro específico se falhar."""
-    
-    if len(password) < 8:
-        raise ValueError("A senha deve ter pelo menos 8 caracteres")
-    
-    if not re.search(r"[A-Z]", password):
-        raise ValueError("A senha deve conter pelo menos uma letra maiúscula")
-        
-    if not re.search(r"[a-z]", password):
-        raise ValueError("A senha deve conter pelo menos uma letra minúscula")
-        
-    if not re.search(r"\d", password):
-        raise ValueError("A senha deve conter pelo menos um número")
-        
-    if not re.search(r"[\[\]\s_!@#$%^&*(),.?\":{}|<>]", password):
-        raise ValueError("A senha deve conter pelo menos um caractere especial")
+    SPECIAL_CHARS = string.punctuation # Caracteres: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+    ESCAPED_SPECIALS = re.escape(SPECIAL_CHARS)
+
+    PASSWORD_PATTERN = re.compile(
+        r"^"                           # Começo da string
+        r"(?=.*[a-z])"                 # Ao menos uma letra minúscula
+        r"(?=.*[A-Z])"                 # Ao menos uma letra maiúscula
+        r"(?=.*\d)"                    # Ao menos um número
+        f"(?=.*[{ESCAPED_SPECIALS}])"  # Ao menos um dos caracteres especiais válidos
+        f"[A-Za-z\\d{ESCAPED_SPECIALS}]" # Lista total de todos os caracteres válidos
+        r"{8,}"                        # Tamanho mínimo de 8 caracteres
+        r"$"                           # Fim da string
+    )   
+    # ↑ CERTIFIQUE-SE: A última string concatenada deve começar com 'r', 
+    # para que o todo seja interpretado como uma regex e não string comum.
+
+    if not PASSWORD_PATTERN.match(password):
+        raise ValueError("""
+            Senha deve conter 8 caracteres, entre eles letras maiúsculas e 
+            minúsculas, dígitos e caracteres especiais.
+        """)
+
