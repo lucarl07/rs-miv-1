@@ -12,7 +12,7 @@ class UserCreate(BaseModel):
 
     nickname: str = Field(min_length=5, max_length=30)
     email: EmailStr
-    password: SecretStr = Field() # Toda validação ocorre no field validator
+    password: SecretStr = Field(min_length=8) 
 
     @field_validator('nickname')
     @classmethod
