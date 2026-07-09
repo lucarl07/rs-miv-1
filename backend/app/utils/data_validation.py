@@ -6,8 +6,8 @@ def check_nickname_validity(nickname: str) -> None:
 
     if not NICKNAME_PATTERN.match(nickname):
         raise ValueError("""
-            Nickname deve conter apenas letras, números, '_' ou '-', entre
-            5 e 30 caracteres.
+            Nickname deve conter apenas letras sem acento, números, '_' ou
+            '-', tendo entre 5 e 30 caracteres.
         """)
 
 def check_pw_validity(password: str) -> None:
@@ -29,7 +29,7 @@ def check_pw_validity(password: str) -> None:
 
     if not PASSWORD_PATTERN.match(password):
         raise ValueError("""
-            Senha deve conter 8 caracteres, entre eles letras maiúsculas e 
-            minúsculas, dígitos e caracteres especiais.
+            Senha deve conter letras maiúsculas e minúsculas, dígitos e 
+            caracteres especiais, tendo no mínimo 8 caracteres.
         """)
 
