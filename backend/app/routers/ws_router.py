@@ -1,6 +1,6 @@
 # Módulos do Projeto
 from app.conn.db import get_db
-from app.models.user import User
+from app.repositories.user import get_user_by_id
 from app.schemas.message import ChatMessagePayload, IncomingMessage, MessageData
 from app.utils.jwt import decode_access_token
 from app.utils.ws import ws_manager
@@ -17,7 +17,6 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import WebSocket
 from fastapi import WebSocketDisconnect
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/ws", tags=["websockets"])
@@ -31,8 +30,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
 
-    result = await db.execute(select(User).where(User.id == token_data.user_id))
-    user = result.scalar_one_or_none()
+    user = await get_user_by_id(db, token_data.user_id)
     if user is None:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
