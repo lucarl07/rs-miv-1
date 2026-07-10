@@ -7,7 +7,7 @@
 
   import useUserData from '@/composables/useUserData.ts'
   import useAuth from '@/composables/useAuth.ts'
-  import useWebSocket from '@/composables/useWebSocket.js'
+  import useWebSocket from '@/composables/useWebSocket'
   import useAutoScroll from '@/composables/useAutoScroll.ts'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
