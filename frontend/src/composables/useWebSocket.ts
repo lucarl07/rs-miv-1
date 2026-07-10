@@ -1,5 +1,3 @@
-/* TODO: Trocar a extensão do arquivo para .ts e fazer tipagem TypeScript */
-
 import { ref, onUnmounted } from 'vue'
 
 import useAuth from '@/composables/useAuth.ts'
@@ -9,23 +7,26 @@ const HEARTBEAT_INTERVAL_MS = 12000
 const RECONNECT_INTERVAL_MS = 3000
 const INTENTIONAL_DISCONNECT_CODE = 4000
 
+const WS_STATUS_TYPES = ['Desconectado', 'Reconectando', 'Conectado'] as const
+type WebSocketStatus = typeof WS_STATUS_TYPES[number]
+
 export default function useWebSocket() {
-  const status = ref('disconnected')   // 'connected' | 'disconnected' | 'reconnecting'
-  const messages = ref([])
-  const onlineUsers = ref([])
+  const status = ref<WebSocketStatus>(WS_STATUS_TYPES[0])
+  const messages = ref<ChatMessageData[]>([])
+  const onlineUsers = ref<string[]>([])
 
-  let ws = null
-  let reconnectTimer = null
-  let heartbeatTimer = null
+  let ws: WebSocket | null = null
+  let reconnectTimer: any = null
+  let heartbeatTimer: any = null
 
-  function sendRaw(payload) {
+  function sendRaw(payload: SentMessage) {
     if (ws?.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(payload))
     }
   }
 
   function startHeartbeat() {
-    stopHeartbeat() // evita duplicar o interval em caso de reconexão
+    stopHeartbeat() // Evita duplicar o interval em caso de reconexão
     heartbeatTimer = setInterval(() => {
       sendRaw({ type: 'heartbeat' })
     }, HEARTBEAT_INTERVAL_MS)
@@ -46,14 +47,14 @@ export default function useWebSocket() {
     ws = new WebSocket(`${WS_URL}/ws?token=${token.value}`)
 
     ws.onopen = () => {
-      status.value = 'connected'
+      status.value = WS_STATUS_TYPES[2]
       console.log('Conectado!')
       clearTimeout(reconnectTimer)
       startHeartbeat()
     }
 
     ws.onmessage = (event) => {
-      const payload = JSON.parse(event.data)
+      const payload: ReceivedMessage = JSON.parse(event.data)
 
       if (payload.type === 'online_users') {
         onlineUsers.value = payload.users
@@ -61,8 +62,8 @@ export default function useWebSocket() {
       }
 
       if (payload.type === 'message_history') {
-        for (const _payload of payload.messages) {
-          messages.value.push(_payload.data)
+        for (const i_payload of payload.messages) {
+          messages.value.push(i_payload.data)
         }
         return // Retorna, pois já readiciona todas as mensagens recebidas no chat.
       }
@@ -89,24 +90,24 @@ export default function useWebSocket() {
         return // Fechamento intencional
       }
 
-      status.value = 'reconnecting'
+      status.value = WS_STATUS_TYPES[2]
       reconnectTimer = setTimeout(connect, RECONNECT_INTERVAL_MS)
       console.log('Desconectado. Tentando reconexão.')
     }
 
     ws.onerror = () => {
-      ws.close()
+      ws!.close()
     }
   }
 
-  function send(content) {
+  function send(content: string) {
     sendRaw({ content })
   }
 
   function disconnect() {
     clearTimeout(reconnectTimer)
     ws?.close(INTENTIONAL_DISCONNECT_CODE, 'logout')
-    status.value = 'disconnected'
+    status.value = WS_STATUS_TYPES[0]
   }
 
   onUnmounted(disconnect)

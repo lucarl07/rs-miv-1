@@ -41,3 +41,49 @@ interface CurrentUserResponse {
 }
 
 interface CurrentUserInfo extends CurrentUserResponse {}
+
+// ==:== MENSAGENS RECEBIDAS ==:==
+
+interface ChatMessageData {
+  nickname: string
+  content: string
+  timestamp: string
+}
+interface UserMessage {
+  type: 'message'
+  data: ChatMessageData
+}
+interface SystemMessage {
+  type: 'connection'
+  event: 'join' | 'leave'
+  nickname: string
+  data: ChatMessageData
+}
+type ChatMessage = UserMessage | SystemMessage
+
+interface MessageHistory {
+  type: 'message_history'
+  messages: ChatMessage[]
+}
+
+interface OnlineUsersMessage {
+  type: 'online_users'
+  users: string[]
+}
+
+type ReceivedMessage =
+  ChatMessage |
+  MessageHistory |
+  OnlineUsersMessage
+
+// ==:== MENSAGENS ENVIADAS ==:==
+
+interface HeartbeatMessage {
+  type: 'heartbeat'
+}
+
+interface SentUserMessage {
+  content: string
+}
+
+type SentMessage = HeartbeatMessage | SentUserMessage
