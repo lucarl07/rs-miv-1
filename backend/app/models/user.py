@@ -1,8 +1,9 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, DateTime
 from datetime import datetime, timezone
 from uuid import uuid4
 from app.conn.db import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -14,3 +15,8 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+
+    key: Mapped["UserKey"] = relationship(
+        back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+
