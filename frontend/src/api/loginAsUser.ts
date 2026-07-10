@@ -15,8 +15,9 @@ async function loginAsUser(
   if (!res.ok) {
     const err = await res.json()
     throw new Error(
-      formatPydanticErrors(err.detail) // Caso err.detail seja um retorno (objeto) do Pydantic
-      ?? 'Credenciais inválidas.'      // Caso err.detail seja outro formato
+      err.detail
+      ? formatPydanticErrors(err.detail)
+      : 'Credenciais inválidas.'
     )
   }
 
