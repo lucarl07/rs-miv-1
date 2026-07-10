@@ -28,9 +28,8 @@ async function registerUser(
   if (!res.ok) {
     const err = await res.json()
     throw new Error(
-      err.detail ??                       // Caso err.detail seja uma string simples
-      formatPydanticErrors(err.detail) ?? // Caso err.detail seja um retorno (objeto) do Pydantic
-      'Erro no cadastro.'                 // Caso err.detail seja outro formato
+      formatPydanticErrors(err.detail) // Caso err.detail seja um retorno (objeto) do Pydantic
+      ?? 'Erro no cadastro.'           // Caso err.detail seja outro formato
     )
   }
 }
