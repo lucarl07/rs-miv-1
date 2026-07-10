@@ -1,4 +1,4 @@
-export default function formatPydanticErrors(errors: string | any[]): string {
+export default function formatAPIErrors(errors: string | any[]): string {
   if (!Array.isArray(errors)) {
     return errors
   }
