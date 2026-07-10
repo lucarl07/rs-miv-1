@@ -7,6 +7,7 @@ from fastapi import FastAPI
 # Módulos do Projeto:
 from .redis import r
 from .db import Base, engine
+import app.models # Importação necessária para sincronização não-lazy
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
