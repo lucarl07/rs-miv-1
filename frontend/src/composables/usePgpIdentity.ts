@@ -32,10 +32,32 @@ export function usePgpIdentity() {
     await generateAndRegisterKeyPair(token);
   }
 
+  async function decryptSessionKey(
+    armoredEnvelope: string
+  ): Promise<Uint8Array> {
+
+    const armoredPrivateKey = getStoredPrivateKey();
+    if (!armoredPrivateKey) {
+      throw new Error('Nenhuma chave privada PGP encontrada no sessionStorage');
+    }
+
+    const privateKey = await openpgp.readPrivateKey({ armoredKey: armoredPrivateKey })
+    const message = await openpgp.readMessage({ armoredMessage: armoredEnvelope })
+
+    const { data } = await openpgp.decrypt({
+      message,
+      decryptionKeys: privateKey,
+      format: 'binary' // Evita a conversão para string que o padrão faria
+    })
+
+    return data as Uint8Array
+  }
+
   return {
     generateAndRegisterKeyPair,
     getStoredPrivateKey,
     ensureKeyPair,
     removeKeyPair,
+    decryptSessionKey
   };
 }
