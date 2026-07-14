@@ -20,10 +20,14 @@ async def upsert_public_key(db: AsyncSession, user_id: str, public_key: str) -> 
     return existing
 
 
-async def get_public_key(db: AsyncSession, user_id: str) -> UserKey | None:
+async def get_public_key(db: AsyncSession, user_id: str) -> str | None:
     result = await db.execute(
         select(UserKey).where(UserKey.user_id == user_id)
     )
-    return result.scalar_one_or_none()
+    existing = result.scalar_one_or_none()
+
+    if not existing: return None
+
+    return existing.public_key
 
 
