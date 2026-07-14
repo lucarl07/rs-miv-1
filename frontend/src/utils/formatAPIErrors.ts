@@ -1,4 +1,8 @@
-export default function formatPydanticErrors(errors: any[]): string {
+export default function formatAPIErrors(errors: string | any[]): string {
+  if (!Array.isArray(errors)) {
+    return errors
+  }
+
   let strErrors = ''
   let len = errors.length
 

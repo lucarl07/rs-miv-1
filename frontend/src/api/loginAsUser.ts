@@ -1,4 +1,4 @@
-import formatPydanticErrors from "@/utils/formatPydanticErrors"
+import formatAPIErrors from "@/utils/formatAPIErrors"
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -15,9 +15,9 @@ async function loginAsUser(
   if (!res.ok) {
     const err = await res.json()
     throw new Error(
-      err.detail ??                       // Caso err.detail seja uma string simples
-      formatPydanticErrors(err.detail) ?? // Caso err.detail seja um retorno (objeto) do Pydantic
-      'Credenciais inválidas.'            // Caso err.detail seja outro formato
+      err.detail
+      ? formatAPIErrors(err.detail)
+      : 'Credenciais inválidas.'
     )
   }
 

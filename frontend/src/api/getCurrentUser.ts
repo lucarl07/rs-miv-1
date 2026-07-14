@@ -1,3 +1,5 @@
+import formatAPIErrors from "@/utils/formatAPIErrors"
+
 const API_URL = import.meta.env.VITE_API_URL
 
 async function getCurrentUser(
@@ -11,8 +13,9 @@ async function getCurrentUser(
   if (!res.ok) {
     const err = await res.json()
     throw new Error(
-      err.detail ??                     // Caso err.detail seja uma string simples
-      'Erro ao buscar o usuário atual.' // Caso err.detail seja outro formato
+      err.detail
+      ? formatAPIErrors(err.detail)
+      : 'Erro ao buscar o usuário atual.'
     )
   }
 
