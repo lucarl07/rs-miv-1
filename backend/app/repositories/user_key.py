@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.user_key import UserKey
 
 
-async def upsert_public_key(db: AsyncSession, user_id: int, public_key: str) -> UserKey:
+async def upsert_public_key(db: AsyncSession, user_id: str, public_key: str) -> UserKey:
     result = await db.execute(
         select(UserKey).where(UserKey.user_id == user_id)
     )
@@ -20,7 +20,7 @@ async def upsert_public_key(db: AsyncSession, user_id: int, public_key: str) -> 
     return existing
 
 
-async def get_public_key(db: AsyncSession, user_id: int) -> UserKey | None:
+async def get_public_key(db: AsyncSession, user_id: str) -> UserKey | None:
     result = await db.execute(
         select(UserKey).where(UserKey.user_id == user_id)
     )
