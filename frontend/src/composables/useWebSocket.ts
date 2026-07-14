@@ -1,6 +1,8 @@
 import { ref, onUnmounted } from 'vue'
 
 import useAuth from '@/composables/useAuth.ts'
+import { usePgpIdentity } from './usePgpIdentity'
+import { useSessionKey } from './useSessionKey'
 
 const WS_URL = import.meta.env.VITE_WS_URL
 const HEARTBEAT_INTERVAL_MS = 12000
@@ -11,6 +13,9 @@ const WS_STATUS_TYPES = ['Desconectado', 'Reconectando', 'Conectado'] as const
 type WebSocketStatus = typeof WS_STATUS_TYPES[number]
 
 export default function useWebSocket() {
+  const { decryptSessionKey } = usePgpIdentity()
+  const { setSessionKey } = useSessionKey()
+
   const status = ref<WebSocketStatus>(WS_STATUS_TYPES[0])
   const messages = ref<ChatMessageData[]>([])
   const onlineUsers = ref<string[]>([])
@@ -53,8 +58,18 @@ export default function useWebSocket() {
       startHeartbeat()
     }
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       const payload: ReceivedMessage = JSON.parse(event.data)
+
+      if (payload.type === 'key_envelope') {
+        try {
+          const key = await decryptSessionKey(payload.encrypted_key)
+          setSessionKey(key)
+        } catch (err) {
+          console.error('Falha ao decifrar a chave de sessão PGP:', err)
+        }
+        return
+      }
 
       if (payload.type === 'online_users') {
         onlineUsers.value = payload.users

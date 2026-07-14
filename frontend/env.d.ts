@@ -61,6 +61,11 @@ interface SystemMessage {
 }
 type ChatMessage = UserMessage | SystemMessage
 
+interface KeyEnvelope {
+  type: 'key_envelope'
+  encrypted_key: string
+}
+
 interface MessageHistory {
   type: 'message_history'
   messages: ChatMessage[]
@@ -72,9 +77,10 @@ interface OnlineUsersMessage {
 }
 
 type ReceivedMessage =
-  ChatMessage |
-  MessageHistory |
-  OnlineUsersMessage
+  ChatMessage
+  | KeyEnvelope
+  | MessageHistory
+  | OnlineUsersMessage
 
 // ==:== MENSAGENS ENVIADAS ==:==
 
