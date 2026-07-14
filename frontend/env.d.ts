@@ -87,3 +87,7 @@ interface SentUserMessage {
 }
 
 type SentMessage = HeartbeatMessage | SentUserMessage
+
+// |==== OUTROS TIPOS DE DADOS ====|
+type PGPSessionKey = Uint8Array | null
+
