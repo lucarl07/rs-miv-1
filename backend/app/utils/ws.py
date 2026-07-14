@@ -27,11 +27,12 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, nickname: str, user_id: str, db: AsyncSession):
         await websocket.accept()
 
+        # Verificando por conexões duplicadas
         old = self.active_connections.get(nickname)
         if old is not None:
             await old.close()
 
-        # Obtendo a chave de sessão e a chave pública (pubkey) do usuário
+        # Obtendo a chave pública (pubkey) do usuário e a chave de sessão (K) 
         public_key = await get_public_key(db, user_id)
         if public_key is None:
             await websocket.close(MISSING_PGP_KEY_CODE, "missing_pgp_key")
@@ -43,7 +44,7 @@ class ConnectionManager:
             await websocket.close(code=1011, reason="server_error")
             return
 
-        # Encriptação da chave de sessão com a pubkey + envio ao cliente
+        # Encriptação de K com a pubkey + envio ao cliente
         session_key = base64.b64decode(session_key_b64)
         encrypted_key = encrypt_session_key(public_key, session_key)
         await websocket.send_text(json.dumps({
@@ -51,12 +52,13 @@ class ConnectionManager:
             "encrypted_key": encrypted_key
         }))
 
+        # Adicionando usuário conectado à lista de presença 
         self.active_connections[nickname] = websocket
         await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
 
+        # Enviando a lista de presença em formato JSON
         keys = [key async for key in r.scan_iter(match="presence:*")]
         online_nicknames = await r.mget(keys) if keys else []
-
         await websocket.send_text(json.dumps({
             "type": "online_users",
             "users": online_nicknames
@@ -75,11 +77,13 @@ class ConnectionManager:
         else:
             messages = await get_last_n_messages(db, n=100)
 
+        # Envia o histórico de mensagens ao cliente
         await websocket.send_text(json.dumps({
             "type": "message_history",
             "messages": messages
         }))
 
+        # Anuncia uma nova conexão para todos as conexões ativas.
         await self.broadcast({
             "type": "connection",
             "event": "join",
