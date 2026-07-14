@@ -1,4 +1,5 @@
 # Bibliotecas Nativas
+import base64
 import json
 import logging
 from uuid import uuid4
@@ -11,10 +12,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # Módulos do Projeto
 from app.conn.redis import r
 from app.repositories.message import get_last_n_messages
+from app.repositories.user_key import get_public_key
+from app.utils.pgp import encrypt_session_key
 
 logger = logging.getLogger(__name__)
 
 PRESENCE_TTL = 30 # segundos
+MISSING_PGP_KEY_CODE = 4001
 
 class ConnectionManager:
     def __init__(self):
@@ -26,6 +30,26 @@ class ConnectionManager:
         old = self.active_connections.get(nickname)
         if old is not None:
             await old.close()
+
+        # Obtendo a chave de sessão e a chave pública (pubkey) do usuário
+        public_key = await get_public_key(db, user_id)
+        if public_key is None:
+            await websocket.close(MISSING_PGP_KEY_CODE, "missing_pgp_key")
+            return
+
+        session_key_b64 = await r.get('session_key:global')
+        if session_key_b64 is None:
+            logger.error("PGP session key not found in Redis database.")
+            await websocket.close(code=1011, reason="server_error")
+            return
+
+        # Encriptação da chave de sessão com a pubkey + envio ao cliente
+        session_key = base64.b64decode(session_key_b64)
+        encrypted_key = encrypt_session_key(public_key, session_key)
+        await websocket.send_text(json.dumps({
+            "type": "key_envelope",
+            "encrypted_key": encrypted_key
+        }))
 
         self.active_connections[nickname] = websocket
         await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
