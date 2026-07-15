@@ -3,6 +3,7 @@ import { ref, onUnmounted } from 'vue'
 import useAuth from '@/composables/useAuth.ts'
 import { usePgpIdentity } from './usePgpIdentity'
 import { useSessionKey } from './useSessionKey'
+import { decryptMessage, encryptMessage } from '@/utils/messageCrypto'
 
 const WS_URL = import.meta.env.VITE_WS_URL
 const HEARTBEAT_INTERVAL_MS = 12000
@@ -14,7 +15,7 @@ type WebSocketStatus = typeof WS_STATUS_TYPES[number]
 
 export default function useWebSocket() {
   const { decryptSessionKey } = usePgpIdentity()
-  const { setSessionKey } = useSessionKey()
+  const { setSessionKey, getSessionKey } = useSessionKey()
 
   const status = ref<WebSocketStatus>(WS_STATUS_TYPES[0])
   const messages = ref<ChatMessageData[]>([])
@@ -28,6 +29,25 @@ export default function useWebSocket() {
     if (ws?.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(payload))
     }
+  }
+
+  async function addToMessageHistory(
+    msgData: ChatMessageData,
+    isContentEncrypted: boolean = true
+  ) {
+    if (!isContentEncrypted) {
+      messages.value.push(msgData)
+      return;
+    }
+
+    const key = getSessionKey()
+    if (!key) {
+      console.error('Mensagem recebida, mas K ainda não disponível — descartada.')
+      return
+    }
+
+    const decryptedContent = await decryptMessage(msgData.content, key)
+    messages.value.push({ ...msgData, content: decryptedContent })
   }
 
   function startHeartbeat() {
@@ -61,40 +81,50 @@ export default function useWebSocket() {
     ws.onmessage = async (event) => {
       const payload: ReceivedMessage = JSON.parse(event.data)
 
+      /* --- MENSAGENS OPERACIONAIS --- */
+
       if (payload.type === 'key_envelope') {
         try {
           const key = await decryptSessionKey(payload.encrypted_key)
           setSessionKey(key)
         } catch (err) {
-          console.error('Falha ao decifrar a chave de sessão PGP:', err)
+          console.error('Falha ao decifrar a chave de sessão K:', err)
+        }
+        return
+      }
+      if (payload.type === 'online_users') {
+        onlineUsers.value = payload.users
+        return
+      }
+
+      /* --- HISTÓRICO DE MENSAGENS (MSGS. DE USUÁRIO AGRUPADAS) --- */
+
+      if (payload.type === 'message_history') {
+        for (const i_payload of payload.messages) {
+          await addToMessageHistory(i_payload.data)
         }
         return
       }
 
-      if (payload.type === 'online_users') {
-        onlineUsers.value = payload.users
-        return // Retorna por não enviar nada visível no chat em si.
-      }
+      /* --- MENSAGENS DO CHAT (SISTEMA & USUÁRIO) --- */
 
-      if (payload.type === 'message_history') {
-        for (const i_payload of payload.messages) {
-          messages.value.push(i_payload.data)
+      let isContentEncrypted = true // Padrão para mensagens do usuário
+
+      if (payload.type === 'connection') {
+        if (
+          payload.event === 'join' &&
+          !onlineUsers.value.includes(payload.nickname)
+          // ↑ Evita exibir mensagens de join duplicadas
+        ) {
+          onlineUsers.value.push(payload.nickname)
         }
-        return // Retorna, pois já readiciona todas as mensagens recebidas no chat.
+        if (payload.event === 'leave') {
+          onlineUsers.value = onlineUsers.value.filter(u => u !== payload.nickname)
+        }
+        isContentEncrypted = false
       }
 
-      if (payload.type === 'connection' && payload.event === 'join'
-        && !onlineUsers.value.includes(payload.nickname)
-        // ↑ Evita duplicidade ao receber uma mensagem de join duplicada
-      ) {
-        onlineUsers.value.push(payload.nickname)
-      }
-
-      if (payload.type === 'connection' && payload.event === 'leave') {
-        onlineUsers.value = onlineUsers.value.filter(u => u !== payload.nickname)
-      }
-
-      messages.value.push(payload.data)
+      await addToMessageHistory(payload.data, isContentEncrypted)
     }
 
     ws.onclose = (event) => {
@@ -115,8 +145,15 @@ export default function useWebSocket() {
     }
   }
 
-  function send(content: string) {
-    sendRaw({ content })
+  async function send(content: string) {
+    const key = getSessionKey()
+    if (!key) {
+      console.error('Chave de sessão K ainda não disponível — mensagem não enviada.')
+      return
+    }
+
+    const encryptedContent = await encryptMessage(content, key)
+    sendRaw({ content: encryptedContent })
   }
 
   function disconnect() {

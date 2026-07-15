@@ -17,7 +17,7 @@
   const { logout } = useAuth()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
 
-  const handleSend = (content) => send(content)
+  const handleSend = async (content) => await send(content)
   const handleLogout = () => {
     const isConfirmed = confirm("Tem certeza de que você deseja sair?")
     if (!isConfirmed) return;
