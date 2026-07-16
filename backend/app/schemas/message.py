@@ -3,22 +3,15 @@ from typing import Literal
 from datetime import datetime
 
 # Bibliotecas Externas
-from pydantic import BaseModel, field_validator, field_serializer
+from pydantic import BaseModel, field_serializer
 
-# Módulos do Sistema
-from app.utils.sanitization import msg_sanitizer
 
 class IncomingMessage(BaseModel):
-    """Schema de dados principais da mensagem de chat, exibidos na UI 
-    do cliente."""
+    """Schema de dados principais da mensagem de chat, com seu conteúdo 
+    sendo criptografado e invisível ao servidor."""
 
     content: str 
 
-    @field_validator("content")
-    @classmethod
-    def sanitize_content(cls, v: str) -> str:
-        sv = msg_sanitizer.clean(v)
-        return sv
 
 class MessageData(BaseModel):
     """Schema de dados principais da mensagem de chat, exibidos na UI 
