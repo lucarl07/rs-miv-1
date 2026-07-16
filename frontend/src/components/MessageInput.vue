@@ -1,11 +1,20 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
 
   import icon_btnSend from '../assets/icons/btn_send.svg'
 
+  const {
+    enableSend = true
+  } = defineProps<{
+    enableSend: boolean
+  }>()
   const emit = defineEmits(['send'])
 
   const message = ref('')
+  const placeholder = computed<string>(() => enableSend
+    ? 'Digite qualquer coisa...'
+    : 'Aguardando o chat carregar...'
+  );
 
   function triggerSendEmit() {
     if (message.value.length > 0) {
@@ -14,13 +23,13 @@
     message.value = ''
   }
 
-  const handleKeyDown = (event) => {
+  function handleKeyDown(event) {
     if (event.key === "Enter" && !event.altKey && !event.shiftKey) {
       event.preventDefault()
       triggerSendEmit()
     }
   }
-  const handleSubmit = () => {
+  function handleSubmit() {
     triggerSendEmit()
   }
 </script>
@@ -35,6 +44,8 @@
     <textarea
       v-model="message"
       @keydown="handleKeyDown"
+      :disabled="!enableSend"
+      :placeholder="placeholder"
       autofocus="true"
       spellcheck="true"
       minlength="1"
@@ -42,9 +53,14 @@
       class="
         w-full h-full resize-none px-4 py-2 text-crushed-berry
         focus:outline-none
+        peer disabled:italic
       "
     />
-    <button @click="handleSubmit" type="submit" class="px-4">
+    <button
+      @click="handleSubmit"
+      type="submit"
+      class="px-4 peer-disabled:hidden"
+    >
       <img
         :src="icon_btnSend"
         alt="Botão de enviar"

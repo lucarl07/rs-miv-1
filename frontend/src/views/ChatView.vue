@@ -1,10 +1,14 @@
 <script setup lang="ts">
+  // Importações externas e assets:
+  import { computed } from 'vue'
   import icon_Exit from "@/assets/icons/exit.png"
 
+  // Componentes:
   import Message from '@/components/Message.vue'
   import MessageInput from '@/components/MessageInput.vue'
   import ChatSidebar from '@/components/ChatSidebar.vue'
 
+  // Composables e outras funções
   import useUserData from '@/composables/useUserData.ts'
   import useAuth from '@/composables/useAuth.ts'
   import useWebSocket from '@/composables/useWebSocket'
@@ -16,6 +20,8 @@
 
   const { logout } = useAuth()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
+
+  const isChatReady = computed<boolean>(() => status.value === 'Conectado')
 
   const handleSend = async (content) => await send(content)
   const handleLogout = () => {
@@ -41,6 +47,7 @@
       </ol>
       <MessageInput
         @send="handleSend"
+        :enableSend="isChatReady"
         class="mb-10 mx-10"
       />
     </main>
