@@ -1,8 +1,8 @@
 import { ref, onUnmounted } from 'vue'
 
 import useAuth from '@/composables/useAuth.ts'
-import { usePgpIdentity } from './usePgpIdentity'
-import { useSessionKey } from './useSessionKey'
+import { usePgpIdentity } from '@/composables/usePgpIdentity'
+import { useSessionKey } from '@/composables/useSessionKey'
 import { decryptMessage, encryptMessage } from '@/utils/messageCrypto'
 
 const WS_URL = import.meta.env.VITE_WS_URL
@@ -15,7 +15,7 @@ type WebSocketStatus = typeof WS_STATUS_TYPES[number]
 
 export default function useWebSocket() {
   const { decryptSessionKey } = usePgpIdentity()
-  const { setSessionKey, getSessionKey } = useSessionKey()
+  const { setSessionKey, waitForSessionKey } = useSessionKey()
 
   const status = ref<WebSocketStatus>(WS_STATUS_TYPES[0])
   const messages = ref<ChatMessageData[]>([])
@@ -24,6 +24,7 @@ export default function useWebSocket() {
   let ws: WebSocket | null = null
   let reconnectTimer: any = null
   let heartbeatTimer: any = null
+  let processingQueue: Promise<void> = Promise.resolve()
 
   function sendRaw(payload: SentMessage) {
     if (ws?.readyState === WebSocket.OPEN) {
@@ -40,14 +41,58 @@ export default function useWebSocket() {
       return;
     }
 
-    const key = getSessionKey()
-    if (!key) {
-      console.error('Mensagem recebida, mas K ainda não disponível — descartada.')
+    const key = await waitForSessionKey()
+    const decryptedContent = await decryptMessage(msgData.content, key)
+    messages.value.push({ ...msgData, content: decryptedContent })
+  }
+
+  async function handleMessage(event: MessageEvent) {
+    const payload: ReceivedMessage = JSON.parse(event.data)
+
+    /* --- MENSAGENS OPERACIONAIS --- */
+
+    if (payload.type === 'key_envelope') {
+      try {
+        const key = await decryptSessionKey(payload.encrypted_key)
+        setSessionKey(key)
+      } catch (err) {
+        console.error('Falha ao decifrar a chave de sessão K:', err)
+      }
+      return
+    }
+    if (payload.type === 'online_users') {
+      onlineUsers.value = payload.users
       return
     }
 
-    const decryptedContent = await decryptMessage(msgData.content, key)
-    messages.value.push({ ...msgData, content: decryptedContent })
+    /* --- HISTÓRICO DE MENSAGENS (MSGS. DE USUÁRIO AGRUPADAS) --- */
+
+    if (payload.type === 'message_history') {
+      for (const i_payload of payload.messages) {
+        await addToMessageHistory(i_payload.data)
+      }
+      return
+    }
+
+    /* --- MENSAGENS DO CHAT (SISTEMA & USUÁRIO) --- */
+
+    let isContentEncrypted = true // Padrão para mensagens do usuário
+
+    if (payload.type === 'connection') {
+      if (
+        payload.event === 'join' &&
+        !onlineUsers.value.includes(payload.nickname)
+        // ↑ Evita exibir mensagens de join duplicadas
+      ) {
+        onlineUsers.value.push(payload.nickname)
+      }
+      if (payload.event === 'leave') {
+        onlineUsers.value = onlineUsers.value.filter(u => u !== payload.nickname)
+      }
+      isContentEncrypted = false
+    }
+
+    await addToMessageHistory(payload.data, isContentEncrypted)
   }
 
   function startHeartbeat() {
@@ -79,52 +124,7 @@ export default function useWebSocket() {
     }
 
     ws.onmessage = async (event) => {
-      const payload: ReceivedMessage = JSON.parse(event.data)
-
-      /* --- MENSAGENS OPERACIONAIS --- */
-
-      if (payload.type === 'key_envelope') {
-        try {
-          const key = await decryptSessionKey(payload.encrypted_key)
-          setSessionKey(key)
-        } catch (err) {
-          console.error('Falha ao decifrar a chave de sessão K:', err)
-        }
-        return
-      }
-      if (payload.type === 'online_users') {
-        onlineUsers.value = payload.users
-        return
-      }
-
-      /* --- HISTÓRICO DE MENSAGENS (MSGS. DE USUÁRIO AGRUPADAS) --- */
-
-      if (payload.type === 'message_history') {
-        for (const i_payload of payload.messages) {
-          await addToMessageHistory(i_payload.data)
-        }
-        return
-      }
-
-      /* --- MENSAGENS DO CHAT (SISTEMA & USUÁRIO) --- */
-
-      let isContentEncrypted = true // Padrão para mensagens do usuário
-
-      if (payload.type === 'connection') {
-        if (
-          payload.event === 'join' &&
-          !onlineUsers.value.includes(payload.nickname)
-          // ↑ Evita exibir mensagens de join duplicadas
-        ) {
-          onlineUsers.value.push(payload.nickname)
-        }
-        if (payload.event === 'leave') {
-          onlineUsers.value = onlineUsers.value.filter(u => u !== payload.nickname)
-        }
-        isContentEncrypted = false
-      }
-
-      await addToMessageHistory(payload.data, isContentEncrypted)
+      processingQueue = processingQueue.then(() => handleMessage(event))
     }
 
     ws.onclose = (event) => {
@@ -146,12 +146,7 @@ export default function useWebSocket() {
   }
 
   async function send(content: string) {
-    const key = getSessionKey()
-    if (!key) {
-      console.error('Chave de sessão K ainda não disponível — mensagem não enviada.')
-      return
-    }
-
+    const key = await waitForSessionKey()
     const encryptedContent = await encryptMessage(content, key)
     sendRaw({ content: encryptedContent })
   }
