@@ -1,4 +1,5 @@
 # Bibliotecas Nativas
+import base64
 import json
 import logging
 from uuid import uuid4
@@ -11,10 +12,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # Módulos do Projeto
 from app.conn.redis import r
 from app.repositories.message import get_last_n_messages
+from app.repositories.user_key import get_public_key
+from app.utils.pgp import encrypt_session_key
 
 logger = logging.getLogger(__name__)
 
 PRESENCE_TTL = 30 # segundos
+MISSING_PGP_KEY_CODE = 4001
 
 class ConnectionManager:
     def __init__(self):
@@ -23,16 +27,38 @@ class ConnectionManager:
     async def connect(self, websocket: WebSocket, nickname: str, user_id: str, db: AsyncSession):
         await websocket.accept()
 
+        # Verificando por conexões duplicadas
         old = self.active_connections.get(nickname)
         if old is not None:
             await old.close()
 
+        # Obtendo a chave pública (pubkey) do usuário e a chave de sessão (K) 
+        public_key = await get_public_key(db, user_id)
+        if public_key is None:
+            await websocket.close(MISSING_PGP_KEY_CODE, "missing_pgp_key")
+            return
+
+        session_key_b64 = await r.get('session_key:global')
+        if session_key_b64 is None:
+            logger.error("PGP session key not found in Redis database.")
+            await websocket.close(code=1011, reason="server_error")
+            return
+
+        # Encriptação de K com a pubkey + envio ao cliente
+        session_key = base64.b64decode(session_key_b64)
+        encrypted_key = encrypt_session_key(public_key, session_key)
+        await websocket.send_text(json.dumps({
+            "type": "key_envelope",
+            "encrypted_key": encrypted_key
+        }))
+
+        # Adicionando usuário conectado à lista de presença 
         self.active_connections[nickname] = websocket
         await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
 
+        # Enviando a lista de presença em formato JSON
         keys = [key async for key in r.scan_iter(match="presence:*")]
         online_nicknames = await r.mget(keys) if keys else []
-
         await websocket.send_text(json.dumps({
             "type": "online_users",
             "users": online_nicknames
@@ -51,11 +77,13 @@ class ConnectionManager:
         else:
             messages = await get_last_n_messages(db, n=100)
 
+        # Envia o histórico de mensagens ao cliente
         await websocket.send_text(json.dumps({
             "type": "message_history",
             "messages": messages
         }))
 
+        # Anuncia uma nova conexão para todos as conexões ativas.
         await self.broadcast({
             "type": "connection",
             "event": "join",
