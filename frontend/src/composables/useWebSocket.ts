@@ -123,7 +123,7 @@ export default function useWebSocket() {
       startHeartbeat()
     }
 
-    ws.onmessage = async (event) => {
+    ws.onmessage = (event) => {
       processingQueue = processingQueue.then(() => handleMessage(event))
     }
 
