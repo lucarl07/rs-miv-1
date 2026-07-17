@@ -1,23 +1,39 @@
-export default function formatAPIErrors(errors: string | any[]): string {
-  if (!Array.isArray(errors)) {
-    return errors
+interface PydanticError {
+  msg: string
+  loc: (string | number)[]
+  type: string
+}
+
+export default function formatAPIErrors(err: string | PydanticError[]): string {
+  if (!Array.isArray(err)) {
+    return err
   }
 
-  let strErrors = ''
-  let len = errors.length
+  let strErr = ''
+  let len = err.length
 
-  if (len < 2) {
-    strErrors = errors[0].msg
-    return strErrors;
+  if (len === 0) {
+    console.error('Aviso sobre a API: Erro não identificado capturado.')
+    return 'Erro desconhecido.' // Caso uma array vazia seja encaminhada como erro
+  }
+  if (len === 1) {
+    const error = err[0]
+
+    if (!error) {
+      console.error('Aviso sobre a API: Erro não identificado capturado.')
+      return 'Erro desconhecido.'
+    }
+
+    return error.msg
   }
 
-  for (let i = 0; i < len; i++) {
+  for (const [i, error] of err.entries()) {
     if (i !== len - 1) {
-      strErrors += `${i+1}. ${errors[i].msg};\n`
+      strErr += `${i+1}. ${error.msg};\n`
     } else {
-      strErrors += `${i+1}. ${errors[i].msg}.\n`
+      strErr += `${i+1}. ${error.msg}.\n`
     }
   }
 
-  return strErrors
+  return strErr
 }
