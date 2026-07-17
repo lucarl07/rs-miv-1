@@ -3,14 +3,21 @@ from typing import Literal
 from datetime import datetime
 
 # Bibliotecas Externas
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, Field, field_serializer
 
 
 class IncomingMessage(BaseModel):
     """Schema de dados principais da mensagem de chat, com seu conteúdo 
     sendo criptografado e invisível ao servidor."""
 
-    content: str 
+    content: str = Field(
+        max_length=6000, 
+        description="""
+            Conteúdo cifrado (IV + ciphertext) em base64 — o limite de 1000
+            caracteres reais é validado no cliente antes da cifra; este 
+            teto é só proteção contra payloads abusivos.
+        """
+    )
 
 
 class MessageData(BaseModel):
@@ -26,10 +33,12 @@ class MessageData(BaseModel):
     def serialize_timestamp(self, v: datetime) -> str:
         return v.isoformat()
 
+
 class ChatMessagePayload(BaseModel):
     """Schema completo de uma mensagem de chat, incluindo seus dados 
     e metadados."""
 
     type: Literal["message"]
     data: MessageData
+
 
