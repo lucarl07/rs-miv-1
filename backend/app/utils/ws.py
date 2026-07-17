@@ -49,15 +49,23 @@ class ConnectionManager:
 
         # Adicionando usuário conectado à lista de presença 
         self.active_connections[nickname] = websocket
-        await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
+        try:
+            await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
+        except Exception as e:
+            logger.warning(f"""
+                Failed to insert user into Redis presence list: {e}
+            """)
 
         # Enviando a lista de presença em formato JSON
-        keys = [key async for key in r.scan_iter(match="presence:*")]
-        online_nicknames = await r.mget(keys) if keys else []
-        await websocket.send_text(json.dumps({
-            "type": "online_users",
-            "users": online_nicknames
-        }))
+        try:
+            keys = [key async for key in r.scan_iter(match="presence:*")]
+            online_nicknames = await r.mget(keys) if keys else []
+            await websocket.send_text(json.dumps({
+                "type": "online_users",
+                "users": online_nicknames
+            }))
+        except Exception as e:
+            logger.warning(f"Failed to send list of online users: {e}")
 
         # Tenta buscar histórico de mensagens no Redis...
         try:
@@ -95,10 +103,20 @@ class ConnectionManager:
         if self.active_connections.get(nickname) is websocket:
             del self.active_connections[nickname]
 
-        await r.delete(f"presence:{user_id}")
+        try:
+            await r.delete(f"presence:{user_id}")
+        except Exception as e:
+            logger.warning(f"""
+                User not instantly removed from Redis presence list: {e}
+            """)
 
     async def renew_presence(self, user_id: str):
-        await r.expire(f"presence:{user_id}", PRESENCE_TTL)
+        try:
+            await r.expire(f"presence:{user_id}", PRESENCE_TTL)
+        except Exception as e:
+            logger.warning(f"""
+               [SEVERE] User presence was not renewed on Redis: {e}
+            """)
 
     async def broadcast(self, message_payload: dict):
         dead = []
