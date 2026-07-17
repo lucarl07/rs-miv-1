@@ -13,18 +13,24 @@
   import useAuth from '@/composables/useAuth.ts'
   import useWebSocket from '@/composables/useWebSocket'
   import useAutoScroll from '@/composables/useAutoScroll.ts'
+  import { useSessionKey } from '@/composables/useSessionKey'
   import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
-  const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
+  const { sessionKey } = useSessionKey()
+  const { logout } = useAuth()
   const { nickname } = useUserData({ loadOnStartup: true })
 
-  const { logout } = useAuth()
+  const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
 
-  const isChatReady = computed<boolean>(() => status.value === 'Conectado')
+  const isChatReady = computed<boolean>(() =>
+    status.value === 'Conectado' && sessionKey.value !== null
+  )
 
-  const handleSend = async (content) => await send(content)
-  const handleLogout = () => {
+  async function handleSend(content) {
+    await send(content)
+  }
+  function handleLogout() {
     const isConfirmed = confirm("Tem certeza de que você deseja sair?")
     if (!isConfirmed) return;
 
