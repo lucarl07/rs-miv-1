@@ -1,5 +1,4 @@
 # Bibliotecas Nativas
-import base64
 import json
 import logging
 from uuid import uuid4
@@ -14,6 +13,7 @@ from app.conn.redis import r
 from app.repositories.message import get_last_n_messages
 from app.repositories.user_key import get_public_key
 from app.utils.pgp import encrypt_session_key
+from app.utils.session_key import derive_session_key
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +38,9 @@ class ConnectionManager:
             await websocket.close(MISSING_PGP_KEY_CODE, "missing_pgp_key")
             return
 
-        session_key_b64 = await r.get('session_key:global')
-        if session_key_b64 is None:
-            logger.error("PGP session key not found in Redis database.")
-            await websocket.close(code=1011, reason="server_error")
-            return
+        session_key = derive_session_key()
 
         # Encriptação de K com a pubkey + envio ao cliente
-        session_key = base64.b64decode(session_key_b64)
         encrypted_key = encrypt_session_key(public_key, session_key)
         await websocket.send_text(json.dumps({
             "type": "key_envelope",
@@ -54,15 +49,23 @@ class ConnectionManager:
 
         # Adicionando usuário conectado à lista de presença 
         self.active_connections[nickname] = websocket
-        await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
+        try:
+            await r.set(f"presence:{user_id}", nickname, ex=PRESENCE_TTL)
+        except Exception as e:
+            logger.warning(f"""
+                Failed to insert user into Redis presence list: {e}
+            """)
 
         # Enviando a lista de presença em formato JSON
-        keys = [key async for key in r.scan_iter(match="presence:*")]
-        online_nicknames = await r.mget(keys) if keys else []
-        await websocket.send_text(json.dumps({
-            "type": "online_users",
-            "users": online_nicknames
-        }))
+        try:
+            keys = [key async for key in r.scan_iter(match="presence:*")]
+            online_nicknames = await r.mget(keys) if keys else []
+            await websocket.send_text(json.dumps({
+                "type": "online_users",
+                "users": online_nicknames
+            }))
+        except Exception as e:
+            logger.warning(f"Failed to send list of online users: {e}")
 
         # Tenta buscar histórico de mensagens no Redis...
         try:
@@ -100,10 +103,20 @@ class ConnectionManager:
         if self.active_connections.get(nickname) is websocket:
             del self.active_connections[nickname]
 
-        await r.delete(f"presence:{user_id}")
+        try:
+            await r.delete(f"presence:{user_id}")
+        except Exception as e:
+            logger.warning(f"""
+                User not instantly removed from Redis presence list: {e}
+            """)
 
     async def renew_presence(self, user_id: str):
-        await r.expire(f"presence:{user_id}", PRESENCE_TTL)
+        try:
+            await r.expire(f"presence:{user_id}", PRESENCE_TTL)
+        except Exception as e:
+            logger.warning(f"""
+               [SEVERE] User presence was not renewed on Redis: {e}
+            """)
 
     async def broadcast(self, message_payload: dict):
         dead = []
