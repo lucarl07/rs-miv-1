@@ -58,6 +58,7 @@
     />
     <button
       @click="handleSubmit"
+      :disabled="!enableSend"
       type="submit"
       class="px-4 peer-disabled:hidden"
     >
