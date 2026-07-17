@@ -1,8 +1,8 @@
 import { ref, onUnmounted } from 'vue'
 
 import useAuth from '@/composables/useAuth.ts'
-import { usePgpIdentity } from '@/composables/usePgpIdentity'
-import { useSessionKey } from '@/composables/useSessionKey'
+import usePgpIdentity from '@/composables/usePgpIdentity'
+import useSessionKey from '@/composables/useSessionKey'
 import { decryptMessage, encryptMessage } from '@/utils/messageCrypto'
 
 const WS_URL = import.meta.env.VITE_WS_URL

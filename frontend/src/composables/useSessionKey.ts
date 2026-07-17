@@ -7,7 +7,7 @@ const sessionKeyReady = new Promise<Uint8Array>(resolve => {
   resolveKeyReady = resolve
 })
 
-export function useSessionKey() {
+export default function useSessionKey() {
   function setSessionKey(key: Uint8Array) {
     sessionKey.value = key
     resolveKeyReady(key)

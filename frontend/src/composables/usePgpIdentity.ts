@@ -3,7 +3,7 @@ import uploadPublicKey from '@/api/uploadPublicKey';
 
 const PRIVATE_KEY_STORAGE_KEY = 'pgp_private_key';
 
-export function usePgpIdentity() {
+export default function usePgpIdentity() {
   async function generateAndRegisterKeyPair(token: string | null) {
     const { privateKey, publicKey } = await openpgp.generateKey({
       type: 'curve25519',

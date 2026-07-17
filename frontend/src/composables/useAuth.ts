@@ -7,7 +7,7 @@ import registerUser from "@/api/registerUser";
 import loginAsUser from "@/api/loginAsUser";
 
 // Outros Composables
-import { usePgpIdentity } from "@/composables/usePgpIdentity";
+import usePgpIdentity from "@/composables/usePgpIdentity";
 
 const TOKEN_KEY = 'access_token'
 const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY))
