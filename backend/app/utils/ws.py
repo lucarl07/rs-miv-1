@@ -1,5 +1,4 @@
 # Bibliotecas Nativas
-import base64
 import json
 import logging
 from uuid import uuid4
