@@ -14,6 +14,7 @@ from app.conn.redis import r
 from app.repositories.message import get_last_n_messages
 from app.repositories.user_key import get_public_key
 from app.utils.pgp import encrypt_session_key
+from app.utils.session_key import derive_session_key
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +39,9 @@ class ConnectionManager:
             await websocket.close(MISSING_PGP_KEY_CODE, "missing_pgp_key")
             return
 
-        session_key_b64 = await r.get('session_key:global')
-        if session_key_b64 is None:
-            logger.error("PGP session key not found in Redis database.")
-            await websocket.close(code=1011, reason="server_error")
-            return
+        session_key = derive_session_key()
 
         # Encriptação de K com a pubkey + envio ao cliente
-        session_key = base64.b64decode(session_key_b64)
         encrypted_key = encrypt_session_key(public_key, session_key)
         await websocket.send_text(json.dumps({
             "type": "key_envelope",
