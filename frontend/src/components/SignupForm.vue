@@ -1,12 +1,18 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import checkNicknameAvailability from '@/api/checkNicknameAvailability'
   import useAuth from '@/composables/useAuth'
+
+  const NICKNAME_REGEX = /^[a-zA-Z0-9_-]{5,30}$/
 
   const router = useRouter()
   const { register } = useAuth()
 
   const nickname = ref('')
+  const nicknameStatus = ref<
+    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+  >('idle')
   const email = ref('')
   const password = ref('')
   const confirmPassword = ref('')
@@ -15,6 +21,46 @@
     confirmPassword: null, other: null
   })
   const isSubmitting = ref(false)
+
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null
+  let checkController: AbortController | null = null
+
+  function clearDebounce() {
+    if (debounceTimer !== null) {
+      clearTimeout(debounceTimer)
+      debounceTimer = null
+    }
+  }
+
+  async function triggerNicknameCheck(value: string) {
+    checkController?.abort()
+    checkController = new AbortController()
+
+    nicknameStatus.value = 'checking'
+
+    try {
+      const result = await checkNicknameAvailability(value, checkController.signal)
+      nicknameStatus.value = result?.available ? 'available' : 'taken'
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return
+      nicknameStatus.value = 'idle'
+    }
+  }
+
+  // Dispara no @input, via watch do ref 'nickname':
+  watch(nickname, (newValue) => {
+    clearDebounce()
+
+    const trimmed = newValue.trim()
+    if (!NICKNAME_REGEX.test(trimmed)) {
+      nicknameStatus.value = trimmed.length === 0 ? 'idle' : 'invalid'
+      return
+    }
+
+    debounceTimer = setTimeout(() => {
+      triggerNicknameCheck(trimmed)
+    }, 500)
+  })
 
   async function handleSubmit(): Promise<void> {
     for (const key in errorMessage.value) {
