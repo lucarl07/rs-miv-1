@@ -1,26 +1,62 @@
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref, watch, computed } from 'vue'
   import { useRouter } from 'vue-router'
+
   import checkNicknameAvailability from '@/api/checkNicknameAvailability'
   import useAuth from '@/composables/useAuth'
-
-  const NICKNAME_REGEX = /^[a-zA-Z0-9_-]{5,30}$/
+  import {
+    NICKNAME_REGEX,
+    checkEmailValidity, checkPasswordValidity, checkPasswordsMatch
+  } from '@/utils/signUpValidation.ts'
 
   const router = useRouter()
   const { register } = useAuth()
 
   const nickname = ref('')
-  const nicknameStatus = ref<
-    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
-  >('idle')
   const email = ref('')
   const password = ref('')
   const confirmPassword = ref('')
-  const errorMessage = ref<SignupFormErrors>({
-    email: null, password: null,
-    confirmPassword: null, other: null
-  })
   const isSubmitting = ref(false)
+
+  const nicknameStatus = ref<
+    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
+  >('idle')
+  const nicknameStatusMessage = computed(() => {
+    switch (nicknameStatus.value) {
+      case 'checking':
+        return 'Verificando disponibilidade...'
+      case 'available':
+        return 'Nickname disponível!'
+      case 'taken':
+        return 'Esse nickname já está em uso'
+      case 'invalid':
+        return 'Use de 5 a 30 caracteres (letras, números, _ ou -)'
+      default:
+        return null
+    }
+  })
+  const nicknameStatusClass = computed(() => {
+    switch (nicknameStatus.value) {
+      case 'checking':
+        return 'text-gray-500'
+      case 'available':
+        return 'text-gray-600'
+      case 'taken': case 'invalid':
+        return 'text-red-400'
+      default:
+        return ''
+    }
+  })
+
+  const errorMessages = computed<SignupFormErrors>(() => ({
+    nickname: nicknameStatusMessage.value,
+    email: checkEmailValidity(email.value),
+    password: checkPasswordValidity(password.value),
+    confirmPassword: checkPasswordsMatch(
+      password.value, confirmPassword.value
+    ),
+    other: null
+  }))
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   let checkController: AbortController | null = null
@@ -63,12 +99,12 @@
   })
 
   async function handleSubmit(): Promise<void> {
-    for (const key in errorMessage.value) {
-      errorMessage.value[key as keyof SignupFormErrors] = null
+    for (const key in errorMessages.value) {
+      errorMessages.value[key as keyof SignupFormErrors] = null
     }
 
     if (password.value !== confirmPassword.value) {
-      errorMessage.value.confirmPassword = 'As senhas não coincidem.'
+      errorMessages.value.confirmPassword = 'As senhas não coincidem.'
       return
     }
 
@@ -78,7 +114,7 @@
       await register(nickname.value, email.value, password.value)
       router.push({ name: 'login' })
     } catch (err) {
-      errorMessage.value.other = err instanceof Error
+      errorMessages.value.other = err instanceof Error
         ? err.message
         : 'Erro inesperado ao tentar criar conta.'
     } finally {
@@ -100,11 +136,18 @@
         required
         autocomplete="nickname"
         class="
-          mt-1 px-3 py-2 w-full rounded-md border border-mauve-500
+          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
           bg-pale-silver
           focus:outline-double focus:outline-crushed-berry
         "
       />
+      <p
+        v-if="errorMessages.nickname"
+        class="mt-1.5 text-sm"
+        :class="nicknameStatusClass"
+      >
+        {{ errorMessages.nickname }}
+      </p>
     </div>
 
     <div id="wrapper_email">
