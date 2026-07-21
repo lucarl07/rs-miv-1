@@ -8,6 +8,13 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+type AsyncFieldEvalStatus =
+  'idle'        // Aguardando avaliação
+  | 'checking'  // Sendo avaliado
+  | 'available' // Resposta: disponível
+  | 'taken'     // Resposta: indisponível
+  | 'invalid'   // Não enviado, pois é inválido
+
 interface RegisterUserPayload {
   nickname: string
   email: string
@@ -43,7 +50,7 @@ interface CurrentUserResponse {
 
 interface CurrentUserInfo extends CurrentUserResponse {}
 
-// ==:== MENSAGENS RECEBIDAS ==:==
+// |=== MENSAGENS RECEBIDAS ===|
 
 interface ChatMessageData {
   nickname: string
@@ -83,7 +90,7 @@ type ReceivedMessage =
   | MessageHistory
   | OnlineUsersMessage
 
-// ==:== MENSAGENS ENVIADAS ==:==
+// |=== MENSAGENS ENVIADAS ===|
 
 interface HeartbeatMessage {
   type: 'heartbeat'
@@ -96,5 +103,6 @@ interface SentUserMessage {
 type SentMessage = HeartbeatMessage | SentUserMessage
 
 // |==== OUTROS TIPOS DE DADOS ====|
+
 type PGPSessionKey = Uint8Array | null
 

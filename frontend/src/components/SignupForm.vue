@@ -18,9 +18,7 @@
   const confirmPassword = ref('')
   const isSubmitting = ref(false)
 
-  const nicknameStatus = ref<
-    'idle' | 'checking' | 'available' | 'taken' | 'invalid'
-  >('idle')
+  const nicknameStatus = ref<AsyncFieldEvalStatus>('idle')
   const nicknameStatusMessage = computed(() => {
     switch (nicknameStatus.value) {
       case 'checking':
