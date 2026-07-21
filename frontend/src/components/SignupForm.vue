@@ -83,17 +83,24 @@
     }
   }
 
-  // Dispara no @input, via watch do ref 'nickname':
   watch(nickname, (newValue) => {
     clearDebounce()
-
     const trimmed = newValue.trim()
-    if (!NICKNAME_REGEX.test(trimmed)) {
-      nicknameStatus.value = trimmed.length === 0 ? 'idle' : 'invalid'
+
+    // 1. Verifica se há algum texto no input
+    if (trimmed.length === 0) {
+      nicknameStatus.value = 'idle'
       return
     }
 
+    // 2. Aguarda 500 milissegundos (ms)
     debounceTimer = setTimeout(() => {
+      // 3. SE trimmed É INVÁLIDO:
+      if (!NICKNAME_REGEX.test(trimmed)) {
+        nicknameStatus.value = 'invalid'
+        return
+      }
+      // 3. SE NÃO:
       triggerNicknameCheck(trimmed)
     }, 500)
   })
