@@ -53,9 +53,9 @@
     password: checkPasswordValidity(password.value),
     confirmPassword: checkPasswordsMatch(
       password.value, confirmPassword.value
-    ),
-    other: null
+    )
   }))
+  const backendErrorMessage = ref<string | null>(null)
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
   let checkController: AbortController | null = null
@@ -136,7 +136,7 @@
       await register(nickname.value, email.value, password.value)
       router.push({ name: 'login' })
     } catch (err) {
-      errorMessages.value.other = err instanceof Error
+      backendErrorMessage.value = err instanceof Error
         ? err.message
         : 'Erro inesperado ao tentar criar conta.'
     } finally {
@@ -207,6 +207,7 @@
       :showOnError="errorMessages.confirmPassword"
     />
 
+
     <div id="wrapper_buttons" class="col-span-2 flex h-12 gap-4">
       <button
         type="submit"
@@ -214,7 +215,7 @@
         :title="!isFormValid && 'Preencha corretamente todos os campos.'"
         class="
           flex w-1/2 bg-crushed-berry rounded-md items-center justify-center
-          disabled:opacity-75
+          cursor-pointer disabled:opacity-75
         "
       >
         Criar conta
@@ -223,10 +224,19 @@
         type="button"
         class="
           flex w-1/2 bg-gray-500 rounded-md items-center justify-center
+          cursor-pointer
         "
       >
         Já tenho uma conta
       </button>
     </div>
+
+    <p
+      v-if="backendErrorMessage"
+      class="mt-1.5 col-span-2 text-center text-sm text-red-400"
+    >
+      <span class="font-bold">Erro pós-envio:</span>
+      {{ backendErrorMessage }}
+    </p>
   </form>
 </template>

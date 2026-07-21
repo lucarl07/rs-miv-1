@@ -38,7 +38,7 @@ interface SignupFormErrors {
   email: string | null
   password: string | null
   confirmPassword: string | null
-  other: string | null
+  other?: string | null
 }
 
 interface CurrentUserResponse {
