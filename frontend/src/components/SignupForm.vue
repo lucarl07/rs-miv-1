@@ -104,6 +104,22 @@
     }, 500)
   })
 
+  const isFormValid = computed<boolean>(() => {
+    const allFieldsFilled =
+      nicknameStatus.value === 'available' &&
+      // ↑ Além de preenchido, garante que ele está disponível
+      email.value.trim().length > 0 &&
+      password.value.length > 0 &&
+      confirmPassword.value.length > 0
+
+    const noErrors =
+      errorMessages.value.email === null &&
+      errorMessages.value.password === null &&
+      errorMessages.value.confirmPassword === null
+
+    return allFieldsFilled && noErrors
+  })
+
   async function handleSubmit(): Promise<void> {
     for (const key in errorMessages.value) {
       errorMessages.value[key as keyof SignupFormErrors] = null
@@ -192,10 +208,23 @@
     />
 
     <div id="wrapper_buttons" class="col-span-2 flex h-12 gap-4">
-      <button type="submit" class="flex w-1/2 bg-crushed-berry items-center justify-center">
+      <button
+        type="submit"
+        :disabled="!isFormValid"
+        :title="!isFormValid && 'Preencha corretamente todos os campos.'"
+        class="
+          flex w-1/2 bg-crushed-berry rounded-md items-center justify-center
+          disabled:opacity-75
+        "
+      >
         Criar conta
       </button>
-      <button type="button" class="flex w-1/2 bg-gray-500 items-center justify-center">
+      <button
+        type="button"
+        class="
+          flex w-1/2 bg-gray-500 rounded-md items-center justify-center
+        "
+      >
         Já tenho uma conta
       </button>
     </div>
