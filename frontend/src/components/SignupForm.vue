@@ -7,7 +7,8 @@
   import {
     NICKNAME_REGEX,
     checkEmailValidity, checkPasswordValidity, checkPasswordsMatch
-  } from '@/utils/signUpValidation.ts'
+  } from '@/utils/signUpValidation'
+  import FormInput from '@/components/FormInput.vue'
 
   const router = useRouter()
   const { register } = useAuth()
@@ -130,66 +131,39 @@
 
 <template>
   <form class="grid grid-cols-2 gap-4 w-xl" @submit.prevent="handleSubmit">
-    <div id="wrapper_username">
-      <label for="nickname" class="block text-sm font-medium text-grey-100">
-        Nome de usuário
-      </label>
-      <input
-        id="nickname"
-        v-model="nickname"
-        type="text"
-        required
-        autocomplete="nickname"
-        class="
-          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
-          bg-pale-silver
-          focus:outline-double focus:outline-crushed-berry
-        "
-      />
-      <p
-        v-if="errorMessages.nickname"
-        class="mt-1.5 text-sm"
-        :class="nicknameStatusClass"
-      >
-        {{ errorMessages.nickname }}
-      </p>
-    </div>
+    <FormInput
+      v-model="nickname"
+      fieldname="nickname"
+      labelText="Nome de usuário"
+      type="text"
+    >
+      <template #customBottomText>
+        <p
+          v-if="errorMessages.nickname"
+          class="mt-1.5 text-sm"
+          :class="nicknameStatusClass"
+        >
+          {{ errorMessages.nickname }}
+        </p>
+      </template>
+    </FormInput>
 
-    <div id="wrapper_email">
-      <label for="email" class="block text-sm font-medium text-grey-100">
-        E-mail
-      </label>
-      <input
-        id="email"
-        v-model="email"
-        type="email"
-        required
-        autocomplete="email"
-        class="
-          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
-          bg-pale-silver
-          focus:outline-double focus:outline-crushed-berry
-        "
-      />
-    </div>
+    <FormInput
+      v-model="email"
+      fieldname="email"
+      labelText="E-mail"
+      type="email"
+      :showOnError="errorMessages.email"
+    />
 
-    <div id="wrapper_password">
-      <label for="password" class="block text-sm font-medium text-grey-100">
-        Senha
-      </label>
-      <input
-        id="password"
-        v-model="password"
-        type="password"
-        required
-        autocomplete="new-password"
-        class="
-          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
-          bg-pale-silver
-          focus:outline-double focus:outline-crushed-berry
-        "
-      />
-    </div>
+    <FormInput
+      v-model="password"
+      fieldname="password"
+      labelText="Senha"
+      autocomplete="new-password"
+      type="password"
+      :showOnError="errorMessages.password"
+    />
 
     <div
       id="wrapper_about_password"
@@ -215,25 +189,14 @@
       </ul>
     </div>
 
-    <div id="wrapper_confirm_password">
-      <label
-        for="confirm_password"
-        class="block text-sm font-medium text-grey-100">
-        Confirmar senha
-      </label>
-      <input
-        id="confirm_password"
-        v-model="confirmPassword"
-        type="password"
-        required
-        autocomplete="confirm_password"
-        class="
-          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
-          bg-pale-silver
-          focus:outline-double focus:outline-crushed-berry
-        "
-      />
-    </div>
+    <FormInput
+      v-model="confirmPassword"
+      fieldname="confirm-password"
+      labelText="Confirmar senha"
+      autocomplete="new-password"
+      type="password"
+      :showOnError="errorMessages.confirmPassword"
+    />
 
     <div id="wrapper_buttons" class="col-span-2 flex h-12 gap-4">
       <button type="submit" class="flex w-1/2 bg-crushed-berry items-center justify-center">
