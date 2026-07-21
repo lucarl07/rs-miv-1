@@ -38,9 +38,9 @@
   const nicknameStatusClass = computed(() => {
     switch (nicknameStatus.value) {
       case 'checking':
-        return 'text-gray-500'
+        return 'text-gray-400'
       case 'available':
-        return 'text-gray-600'
+        return 'text-green-600'
       case 'taken': case 'invalid':
         return 'text-red-400'
       default:
