@@ -49,7 +49,7 @@
     <slot name="customBottomText">
       <p
         v-if="showOnError"
-        class="mt-1.5 text-sm"
+        class="mt-1.5 text-sm text-red-400"
       >
         {{ showOnError }}
       </p>
