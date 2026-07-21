@@ -167,25 +167,18 @@
 
     <div
       id="wrapper_about_password"
-      class="p-2 max-h-37 border border-white row-span-2 text-sm"
+      class="
+        flex flex-col justify-evenly p-2 row-span-2
+        border border-white rounded-md text-sm
+      "
     >
-      <h3>A senha deve conter, no mínimo:</h3>
-      <ul>
-        <li>
-          Um número
-        </li>
-        <li>
-          Uma letra maiúscula
-        </li>
-        <li>
-          Uma letra minúscula
-        </li>
-        <li>
-          Um caractere especial
-        </li>
-        <li>
-          Tamanho de 8 caracteres
-        </li>
+      <h3 class="font-semibold">A senha deve conter, no mínimo:</h3>
+      <ul class="list-inside list-disc">
+        <li>Tamanho de 8 caracteres</li>
+        <li>Um número</li>
+        <li>Uma letra maiúscula</li>
+        <li>Uma letra minúscula</li>
+        <li>Um caractere especial</li>
       </ul>
     </div>
 
