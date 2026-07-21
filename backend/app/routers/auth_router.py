@@ -22,7 +22,7 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)) ->
     if are_user_credentials_used is True:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Nickname ou email já cadastrado.",
+            detail="Nome de usuário e/ou email já cadastrado(s).",
         )
 
     new_user = await create_new_user(db, user_data)
