@@ -161,7 +161,7 @@
         required
         autocomplete="email"
         class="
-          mt-1 px-3 py-2 w-full rounded-md border border-mauve-500
+          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
           bg-pale-silver
           focus:outline-double focus:outline-crushed-berry
         "
@@ -179,7 +179,7 @@
         required
         autocomplete="new-password"
         class="
-          mt-1 px-3 py-2 w-full rounded-md border border-mauve-500
+          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
           bg-pale-silver
           focus:outline-double focus:outline-crushed-berry
         "
@@ -223,7 +223,7 @@
         required
         autocomplete="confirm_password"
         class="
-          mt-1 px-3 py-2 w-full rounded-md border border-mauve-500
+          mt-1.5 px-3 py-2 w-full rounded-md border border-mauve-500
           bg-pale-silver
           focus:outline-double focus:outline-crushed-berry
         "
