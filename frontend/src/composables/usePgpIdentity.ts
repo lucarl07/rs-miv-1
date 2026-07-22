@@ -21,15 +21,15 @@ export default function usePgpIdentity() {
     return sessionStorage.getItem(PRIVATE_KEY_STORAGE_KEY);
   }
 
-  function removeKeyPair() {
-    sessionStorage.removeItem(PRIVATE_KEY_STORAGE_KEY)
-  }
-
   async function ensureKeyPair(token: string | null) {
     const existing = getStoredPrivateKey();
     if (existing) return;
 
     await generateAndRegisterKeyPair(token);
+  }
+
+  function removeKeyPair() {
+    sessionStorage.removeItem(PRIVATE_KEY_STORAGE_KEY)
   }
 
   async function decryptSessionKey(
