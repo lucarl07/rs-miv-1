@@ -17,6 +17,14 @@ async def _get_user_by_field(db: AsyncSession, field, value: str) -> User | None
     return result.scalar_one_or_none()
 
 # Funções Públicas
+async def nickname_exists(db: AsyncSession, nickname: str) -> bool:
+    existing = await _get_user_by_field(db, User.nickname, nickname)
+
+    if existing is not None:
+        return True
+
+    return False
+
 async def check_if_user_creds_exist(db: AsyncSession, nickname: str, email: str) -> bool:
     """Verifica se as credenciais fornecidas já estão sendo usadas
     por outro usuário."""

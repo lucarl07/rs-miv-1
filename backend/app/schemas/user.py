@@ -7,6 +7,13 @@ from pydantic import BaseModel, EmailStr, ConfigDict, Field, SecretStr, field_va
 # Módulos do Sistema
 from app.utils.data_validation import check_nickname_validity, check_pw_validity
 
+class UserFieldCheck(BaseModel):
+    """Schema de retorno para a disponibilidade de campos únicos (ex.: 
+    nickname, email)."""
+
+    available: bool
+
+
 class UserCreate(BaseModel):
     """Schema de entrada para o registro de um novo usuário."""
 
