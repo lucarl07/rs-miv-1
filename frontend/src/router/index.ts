@@ -27,7 +27,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, restoreSession } = useAuth()
+
+  restoreSession()
 
   if (to.name === 'chat' && !isAuthenticated.value) {
     return { name: 'login' }

@@ -11,6 +11,7 @@ import usePgpIdentity from "@/composables/usePgpIdentity";
 
 const TOKEN_KEY = 'access_token'
 const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY))
+const sessionError = ref<string | null>(null)
 
 export default function useAuth() {
   const router = useRouter()
@@ -44,5 +45,25 @@ export default function useAuth() {
     removeKeyPair()
   }
 
-  return { token, isAuthenticated, login, register, logout }
+  function restoreSession(): boolean {
+    if (!token.value) {
+      return false
+    }
+
+    const { getStoredPrivateKey } = usePgpIdentity()
+    const hasStoredKeyPair = getStoredPrivateKey() !== null
+
+    if (!hasStoredKeyPair) {
+      logout() // já deve existir, limpa token + chave + qualquer estado relacionado
+      sessionError.value = 'Sessão de criptografia perdida. Faça login novamente.'
+      return false
+    }
+
+    return true
+  }
+
+  return {
+    token, isAuthenticated,
+    login, register, logout, restoreSession
+  }
 }
