@@ -24,7 +24,9 @@
     : 'Este campo é opcional.'
   )
 
-  const isPasswordField = computed(() => attrs.type === 'password')
+  const isPasswordField = computed(() =>
+    attrs.type === 'password' || fieldname === 'password'
+  )
   const showPassword = ref(false)
 
   const inputType = computed(() =>
