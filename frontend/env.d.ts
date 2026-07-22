@@ -8,6 +8,24 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+//#region |==== Criptografia ====|
+
+type _PGPUnknownKeyPairName = 'unknown'
+
+type PGPKeyPairName = UserId | _PGPUnknownKeyPairName
+
+type PGPSessionKey = Uint8Array | null
+
+//#endregion
+
+//#region |=== Identificadores (UUIDs) ===|
+
+type UserId = string & { readonly _userId: unique symbol }
+
+type MessageId = string & { readonly _messageId: unique symbol }
+
+//#endregion
+
 type AsyncFieldEvalStatus =
   'idle'        // Aguardando avaliação
   | 'checking'  // Sendo avaliado
@@ -102,7 +120,4 @@ interface SentUserMessage {
 
 type SentMessage = HeartbeatMessage | SentUserMessage
 
-// |==== OUTROS TIPOS DE DADOS ====|
-
-type PGPSessionKey = Uint8Array | null
 

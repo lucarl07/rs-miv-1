@@ -1,13 +1,16 @@
 import * as openpgp from 'openpgp';
 import uploadPublicKey from '@/api/uploadPublicKey';
+import decodeToken from '@/utils/decodeToken';
 
 const PRIVATE_KEY_STORAGE_KEY = 'pgp_private_key';
 
 export default function usePgpIdentity() {
-  async function generateAndRegisterKeyPair(token: string | null) {
+  async function generateAndRegisterKeyPair(
+    token: string | null, keyPairName: PGPKeyPairName
+  ) {
     const { privateKey, publicKey } = await openpgp.generateKey({
       type: 'curve25519',
-      userIDs: [{ name: 'RS-MIV-1 user' }],
+      userIDs: [{ name: keyPairName }],
       format: 'armored',
     });
 
@@ -22,10 +25,15 @@ export default function usePgpIdentity() {
   }
 
   async function ensureKeyPair(token: string | null) {
-    const existing = getStoredPrivateKey();
-    if (existing) return;
+    const existing = getStoredPrivateKey()
 
-    await generateAndRegisterKeyPair(token);
+    if (existing) return
+    if (!token) throw new Error('Token não encontrado.')
+
+    const payload = decodeToken(token)
+    const userId = payload?.sub ?? 'unknown'
+
+    await generateAndRegisterKeyPair(token, userId);
   }
 
   function removeKeyPair() {
