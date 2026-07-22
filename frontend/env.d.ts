@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+//#region |=== Tipos padrão do Vue ===|
+
 interface ImportMetaEnv {
   readonly VITE_API_URL: string
 }
@@ -7,6 +9,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+//#endregion
 
 //#region |==== Criptografia ====|
 
@@ -26,12 +30,24 @@ type MessageId = string & { readonly _messageId: unique symbol }
 
 //#endregion
 
+//#region |=== Validação de Formulário ===|
+
 type AsyncFieldEvalStatus =
   'idle'        // Aguardando avaliação
   | 'checking'  // Sendo avaliado
   | 'available' // Resposta: disponível
   | 'taken'     // Resposta: indisponível
   | 'invalid'   // Não enviado, pois é inválido
+
+interface SignupFormErrors {
+  nickname: string | null
+  email: string | null
+  password: string | null
+  confirmPassword: string | null
+  other?: string | null
+}
+
+//#region |=== API (Payloads e Respostas HTTP) ===|
 
 interface RegisterUserPayload {
   nickname: string
@@ -51,14 +67,6 @@ interface LoginResponse {
   token_type: string
 }
 
-interface SignupFormErrors {
-  nickname: string | null
-  email: string | null
-  password: string | null
-  confirmPassword: string | null
-  other?: string | null
-}
-
 interface CurrentUserResponse {
   id: string
   nickname: string
@@ -68,7 +76,11 @@ interface CurrentUserResponse {
 
 interface CurrentUserInfo extends CurrentUserResponse {}
 
-// |=== MENSAGENS RECEBIDAS ===|
+//#endregion
+
+//#region |=== Chat (Broadcasts WebSocket) ===|
+
+// |--- Mensagens Recebidas ---|
 
 interface ChatMessageData {
   nickname: string
@@ -97,7 +109,7 @@ interface MessageHistory {
   messages: ChatMessage[]
 }
 
-interface OnlineUsersMessage {
+interface OnlineUsers {
   type: 'online_users'
   users: string[]
 }
@@ -106,9 +118,9 @@ type ReceivedMessage =
   ChatMessage
   | KeyEnvelope
   | MessageHistory
-  | OnlineUsersMessage
+  | OnlineUsers
 
-// |=== MENSAGENS ENVIADAS ===|
+// |--- Mensagens Enviadas ---|
 
 interface HeartbeatMessage {
   type: 'heartbeat'
@@ -120,4 +132,5 @@ interface SentUserMessage {
 
 type SentMessage = HeartbeatMessage | SentUserMessage
 
+//#endregion
 
