@@ -145,7 +145,9 @@
       isSubmitting.value = false
     }
   }
-
+  function handleGoToLogin(): void {
+    router.push({ name: 'login' })
+  }
 </script>
 
 <template>
@@ -230,6 +232,7 @@
           </button>
           <button
             type="button"
+            @click="handleGoToLogin"
             class="
               flex w-1/2 bg-gray-500 rounded-md items-center justify-center
               cursor-pointer
