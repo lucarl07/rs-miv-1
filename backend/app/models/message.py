@@ -17,10 +17,6 @@ class Message(Base):
         String(36), 
         ForeignKey("users.id")
     )
-    nickname: Mapped[str] = mapped_column(
-        String(50), 
-        nullable=False
-    )
     content: Mapped[str] = mapped_column(
         String(2000), 
         nullable=False

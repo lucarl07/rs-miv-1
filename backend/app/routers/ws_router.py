@@ -36,7 +36,7 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
         return
  
     nickname = user.nickname
-    user_id = str(user.id)
+    user_id = user.id
 
     # Tentando se conectar ao WebSocket:
     await ws_manager.connect(websocket, nickname, user_id, db)
@@ -51,14 +51,14 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
                 continue
             
             clean_msg = IncomingMessage(**data)
-            stored_msg = await save_message(db, nickname, clean_msg.content)
+            stored_msg = await save_message(db, user_id, clean_msg.content)
 
             await ws_manager.broadcast(
                 ChatMessagePayload(
                     type='message',
                     data=MessageData(
                         id=stored_msg.id,
-                        nickname=stored_msg.nickname,
+                        nickname=nickname,
                         content=stored_msg.content,
                         timestamp=stored_msg.timestamp
                     )
