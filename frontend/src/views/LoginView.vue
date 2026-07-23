@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router'
   import useAuth from '@/composables/useAuth'
   import FormInput from '@/components/FormInput.vue'
+  import ErrorMessage from '@/components/ErrorMessage.vue'
 
   const router = useRouter()
   const { login } = useAuth()
@@ -64,15 +65,14 @@
           {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
         </button>
 
-        <div
+        <ErrorMessage
           v-if="errorMessage"
-          class="text-center text-sm text-red-400"
-        >
-          <p class="font-bold">Erro ao tentar fazer login:</p>
-          <p>{{ errorMessage }}</p>
-        </div>
+          error-type="Erro ao tentar fazer login"
+          :message="errorMessage"
+          :inline-message="false"
+        />
 
-        <p class="text-center text-mauve-400">
+        <p class="text-center text-sm text-mauve-400">
           Ainda não tem uma conta?
           <span
             @click="handleRegister"

@@ -8,7 +8,9 @@
     NICKNAME_REGEX,
     checkEmailValidity, checkPasswordValidity, checkPasswordsMatch
   } from '@/utils/signUpValidation'
+
   import FormInput from '@/components/FormInput.vue'
+  import ErrorMessage from '@/components/ErrorMessage.vue'
 
   const router = useRouter()
   const { register } = useAuth()
@@ -237,13 +239,12 @@
           </button>
         </div>
 
-        <p
+        <ErrorMessage
           v-if="backendErrorMessage"
-          class="mt-1.5 col-span-2 text-center text-sm text-red-400"
-        >
-          <span class="font-bold">Erro pós-envio:</span>
-          {{ backendErrorMessage }}
-        </p>
+          error-type="Erro pós-envio"
+          :message="backendErrorMessage"
+          class="col-span-2"
+        />
       </form>
     </div>
   </main>
