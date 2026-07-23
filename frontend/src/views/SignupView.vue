@@ -9,6 +9,7 @@
     checkEmailValidity, checkPasswordValidity, checkPasswordsMatch
   } from '@/utils/signUpValidation'
 
+  import Button from '@/components/Button.vue'
   import FormInput from '@/components/FormInput.vue'
   import ErrorMessage from '@/components/ErrorMessage.vue'
 
@@ -219,27 +220,18 @@
 
 
         <div id="wrapper_buttons" class="col-span-2 flex h-12 gap-4">
-          <button
+          <Button
             type="submit"
             :disabled="!isFormValid"
             :title="!isFormValid && 'Preencha corretamente todos os campos.'"
-            class="
-              flex w-1/2 bg-crushed-berry rounded-md items-center justify-center
-              cursor-pointer disabled:opacity-75
-            "
-          >
-            Criar conta
-          </button>
-          <button
-            type="button"
+            class="bg-crushed-berry w-1/2"
+            text="Criar conta"
+          />
+          <Button
             @click="handleGoToLogin"
-            class="
-              flex w-1/2 bg-gray-500 rounded-md items-center justify-center
-              cursor-pointer
-            "
-          >
-            Já tenho uma conta
-          </button>
+            class="bg-gray-500 w-1/2"
+            text="Já tenho uma conta"
+          />
         </div>
 
         <ErrorMessage

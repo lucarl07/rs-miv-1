@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+
   import useAuth from '@/composables/useAuth'
+
+  import Button from '@/components/Button.vue'
   import FormInput from '@/components/FormInput.vue'
   import ErrorMessage from '@/components/ErrorMessage.vue'
 
@@ -54,16 +57,12 @@
           autocomplete="current-password"
         />
 
-        <button
+        <Button
           type="submit"
           :disabled="isSubmitting"
-          class="
-            px-4 py-2 rounded-md bg-crushed-berry text-white
-            disabled:opacity-50 hover:cursor-pointer
-          "
-        >
-          {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
-        </button>
+          class="px-4 py-2 bg-crushed-berry"
+          :text=" isSubmitting ? 'Entrando...' : 'Entrar' "
+        />
 
         <ErrorMessage
           v-if="errorMessage"
