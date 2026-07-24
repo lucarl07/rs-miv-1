@@ -1,7 +1,4 @@
 # Bibliotecas Nativas
-import base64
-import secrets
-import logging
 from contextlib import asynccontextmanager
 
 # Bibliotecas do Projeto
@@ -11,8 +8,6 @@ from fastapi import FastAPI
 from .redis import r
 from .db import Base, engine
 import app.models # Importação necessária para sincronização não-lazy
-
-logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
