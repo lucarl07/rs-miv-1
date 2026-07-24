@@ -1,5 +1,5 @@
-# Starts local environment (currently will be done manually)
-# source .venv/bin/activate
+# Migrate database
+alembic upgrade head
 
 # Run API with Uvicorn
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
