@@ -1,0 +1,34 @@
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: rs-miv-1-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rsmiv
+      POSTGRES_PASSWORD: rsmiv_dev_password
+      POSTGRES_DB: rsmiv_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rsmiv -d rsmiv_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+
+  redis_data:
+
+  postgres_data:
+
