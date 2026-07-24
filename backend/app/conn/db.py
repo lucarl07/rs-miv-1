@@ -21,6 +21,8 @@ connect_args = {}
 
 if "sslmode=require" in DB_URL:
     DB_URL = re.sub(r"[?&]sslmode=require", "", DB_URL)
+    if "?" not in DB_URL and "&" in DB_URL:
+        DB_URL = DB_URL.replace("&", "?", 1)
     connect_args = {"ssl": "require"}
 
 # Objetos para a conexão com o banco de dados
