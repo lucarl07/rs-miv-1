@@ -18,7 +18,7 @@ DB_ECHO = os.environ.get("DB_ECHO", '0').strip().lower() in ('1', 'true', 'yes')
 # Objetos para a conexão com o banco de dados
 engine = create_async_engine(
     DB_URL, 
-    connect_args={"check_same_thread": False}, 
+    connect_args={}, 
     echo=DB_ECHO
 )
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
