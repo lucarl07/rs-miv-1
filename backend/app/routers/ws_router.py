@@ -8,6 +8,7 @@ from app.repositories.message import save_message
 
 # Bibliotecas Nativas
 import json
+import logging
 from uuid import uuid4
 from datetime import datetime, timezone
 
@@ -18,6 +19,8 @@ from fastapi import Depends
 from fastapi import WebSocket
 from fastapi import WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ws", tags=["websockets"])
 
@@ -39,7 +42,15 @@ async def ws_chat(websocket: WebSocket, token: str, db: AsyncSession = Depends(g
     user_id = user.id
 
     # Tentando se conectar ao WebSocket:
-    await ws_manager.connect(websocket, nickname, user_id, db)
+    try:
+        await ws_manager.connect(websocket, nickname, user_id, db)
+    except Exception as e:
+        logger.error(f"Erro ao estabelecer conexão para {nickname}: {e}")
+        try:
+            await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
+        except RuntimeError:
+            pass
+        return
 
     # Ao estar na conexão WebSocket:
     try:

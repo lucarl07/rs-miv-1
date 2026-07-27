@@ -30,7 +30,10 @@ class ConnectionManager:
         # Verificando por conexões duplicadas
         old = self.active_connections.get(nickname)
         if old is not None:
-            await old.close()
+            try:
+                await old.close()
+            except RuntimeError:
+                pass
 
         # Obtendo a chave pública (pubkey) do usuário e a chave de sessão (K) 
         public_key = await get_public_key(db, user_id)
