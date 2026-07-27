@@ -84,6 +84,7 @@ interface CurrentUserInfo extends CurrentUserResponse {}
 // |--- Mensagens Recebidas ---|
 
 interface ChatMessageData {
+  id: MessageId
   nickname: string
   content: string
   timestamp: string
