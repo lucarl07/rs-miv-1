@@ -23,7 +23,7 @@
     message.value = ''
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     if (event.key === "Enter" && !event.altKey && !event.shiftKey) {
       event.preventDefault()
       triggerSendEmit()

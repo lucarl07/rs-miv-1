@@ -27,7 +27,7 @@
     status.value === 'Conectado' && sessionKey.value !== null
   )
 
-  async function handleSend(content) {
+  async function handleSend(content: string) {
     await send(content)
   }
   function handleLogout() {
