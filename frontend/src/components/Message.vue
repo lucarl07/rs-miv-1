@@ -2,10 +2,10 @@
   import formatDate from '../utils/formatDate.ts'
 
   const props = defineProps<{
-    username: String,
-    content: String,
-    timestamp: String,
-    isSystemMessage?: Boolean
+    username: string,
+    content: string,
+    timestamp: string,
+    isSystemMessage?: boolean
   }>();
 
   const typedDate: Date = new Date(props.timestamp)
