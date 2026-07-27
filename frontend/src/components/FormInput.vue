@@ -14,7 +14,7 @@
   } = defineProps<{
     fieldname: string
     labelText?: string
-    showOnError?: string
+    showOnError?: string | null
     isRequired?: boolean
   }>()
 
