@@ -10,9 +10,10 @@
   const model = defineModel()
   const attrs = useAttrs()
   const {
-    fieldname, labelText, showOnError, isRequired = true
+    fieldname, autocomplete, labelText, showOnError, isRequired = true
   } = defineProps<{
     fieldname: string
+    autocomplete?: string
     labelText?: string
     showOnError?: string | null
     isRequired?: boolean
@@ -62,7 +63,7 @@
         :type="inputType"
         :id="fieldname"
         :required="isRequired"
-        :autocomplete="$attrs.autocomplete || fieldname"
+        :autocomplete="autocomplete || fieldname"
         class="
           px-3 py-2 w-full rounded-md border border-mauve-500
           bg-pale-silver text-crushed-berry
