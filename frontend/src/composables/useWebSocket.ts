@@ -135,7 +135,7 @@ export default function useWebSocket() {
         return // Fechamento intencional
       }
 
-      status.value = WS_STATUS_TYPES[2]
+      status.value = WS_STATUS_TYPES[1]
       reconnectTimer = setTimeout(connect, RECONNECT_INTERVAL_MS)
       console.log('Desconectado. Tentando reconexão.')
     }
