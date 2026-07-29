@@ -1,9 +1,9 @@
-<hgroup align="center">
+<div align="center">
     <h1>💬 RS-MIV-1</h1>
     <p>
         <b>Rede Social de Mensagens Instantâneas em Vue.js</b>
     </p>
-</hgroup>
+</div>
 
 ## Visão geral
 
@@ -12,7 +12,6 @@ O RS-MIV (Rede Social de Mensagens Instantâneas em Vue.js) é uma aplicação d
 Tive como objetivos me aprofundar no uso de Vue.js e TypeScript para desenvolvimento front-end - escolhendo Python para o back-end por familiaridade com a linguagem, mas curiosidade de fazer uma API com ela - e obter conhecimento num protocolo de *instant messaging* (comunicação instantânea), que nesse caso foi o WebSocket (RFC 6455).
 
 Ao longo do desenvolvimento, o escopo se expandiu para incluir persistência de mensagens em PostgreSQL e Redis, criptografia end-to-end através de pares de chaves PGP e o uso do Alembic para permitir migração do banco de dados — tornando o projeto um estudo mais aprofundado de segurança e arquitetura full-stack do que antes planejado. 
-
 
 ## Estrutura de arquivos
 
