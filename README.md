@@ -7,11 +7,14 @@
 
 ## Visão geral
 
-O RS-MIV (Rede Social de Mensagens Instantâneas em Vue.js) é uma aplicação de chat em tempo real via mensagens de texto, construída como projeto de portfólio. Tive como objetivos me aprofundar no uso de Vue.js e TypeScript para desenvolvimento front-end - escolhendo Python para o back-end por familiaridade com a linguagem, mas curiosidade de fazer uma API com ela - e obter conhecimento num protocolo de *instant messaging* (comunicação instantânea), que nesse caso foi o WebSocket (RFC 6455).
+O RS-MIV (Rede Social de Mensagens Instantâneas em Vue.js) é uma aplicação de chat em tempo real via mensagens de texto, construída como projeto de portfólio. Hoje, a aplicação está implantada em produção (Render, Neon e Upstash), e atualmente se encontra na fase final de desenvolvimento.
 
-Ao longo do desenvolvimento, o escopo se expandiu para incluir persistência de mensagens em PostgreSQL e Redis, criptografia end-to-end através de pares de chaves PGP e o uso do Alembic para permitir migração do banco de dados — tornando o projeto um estudo mais aprofundado de segurança e arquitetura full-stack do que originalmente planejado. A aplicação está implantada em produção (Render, Neon e Upstash), e atualmente se encontra na fase final de desenvolvimento.
+Tive como objetivos me aprofundar no uso de Vue.js e TypeScript para desenvolvimento front-end - escolhendo Python para o back-end por familiaridade com a linguagem, mas curiosidade de fazer uma API com ela - e obter conhecimento num protocolo de *instant messaging* (comunicação instantânea), que nesse caso foi o WebSocket (RFC 6455).
 
-### Estrutura de arquivos
+Ao longo do desenvolvimento, o escopo se expandiu para incluir persistência de mensagens em PostgreSQL e Redis, criptografia end-to-end através de pares de chaves PGP e o uso do Alembic para permitir migração do banco de dados — tornando o projeto um estudo mais aprofundado de segurança e arquitetura full-stack do que antes planejado. 
+
+
+## Estrutura de arquivos
 
 O projeto é organizado numa estrutura monólita (monorepo), contendo tanto o código para execução da API quanto do website.
 
@@ -134,15 +137,14 @@ Para mais informações sobre o Vite, ler o [`README.md`](./frontend/README.md) 
 > [!IMPORTANT] 
 > Antes de tentar executar o back-end, certifique-se que os bancos de dados já estão funcionando - seja localmente (via Docker Compose) ou remotamente - **se não, a API não inicializará**. 
 >
-> Caso deseja seguir com a execução local, veja as seções [Banco de dados SQL (PostgreSQL)](#banco-de-dados-sql-postgres) e [Banco de dados NoSQL (Redis)](#banco-de-dados-nosql-redis).
+> Caso deseja seguir com a execução local, veja a seção seguinte: [Bancos de dados (PostgreSQL & Redis)](#bancos-de-dados-postgresql--redis)
 
 Antes de tudo, crie um arquivo `.env` na raiz da pasta `backend/` contendo os seguintes valores abaixo.
 
-```py # Só pra ter highlight de cores mesmo
+```env # Só pra ter highlight de cores mesmo
 # --- URLs secretas ---
-# Os valores das URLs podem ser substituídos conforme o que você for usar;
-# mas aqui já está os padrões conforme o docker-compose.yml e às 
-# configurações do front-end:
+# Os valores das URLs podem ser substituídos conforme o que você for usar, mas aqui
+# já está os padrões conforme o docker-compose.yml e às configurações do front-end:
 REDIS_URL="redis://localhost:6379"
 DB_URL="postgresql://rsmiv:rsmiv_dev_password@localhost:5432/rsmiv_dev" 
 CORS_ALLOWED_ORIGINS="http://localhost:5173" # Pode ser uma lista de endereços separada por vírgulas, sem espaços (ex.: "http://a.a,http://b.b")
@@ -182,7 +184,14 @@ uvicorn app.main:app --reload
 
 ### Bancos de dados (PostgreSQL & Redis)
 
-Certifique-se o Docker está instalado e configurado (com o Docker Compose) na sua máquina.
+O guia a seguir é para a integração dos bancos de dados como serviços em contêineres Docker (método recomendado). Caso desejar continuar usando serviços remotos (ex.: Upstash ou Redis Cloud p/a Redis; Neon ou Supabase p/a banco relacional) ou outros serviços locais já configurados, apenas altere as duas variáveis de ambiente abaixo em `backend/.env`: 
+
+```env
+DB_URL=[nova URL]
+REDIS_URL=[nova URL]
+```
+
+Caso deseja prosseguir com a execução padrão, certifique-se o Docker está instalado e configurado (com o Docker Compose) na sua máquina.
 
 Como a pasta `backend/` já contêm um arquivo `docker-compose.yml`, iremos utilizar as configurações nele estabelecidas para baixar as imagens e iniciar os serviços `backend-postgres-1` e `rs-miv-1-redis`.
 
@@ -226,4 +235,8 @@ Você pode substituir `rsmiv` por outro nome de usuário e `rsmiv_dev` por outro
 
 ## Limitações Conhecidas
 
+(T.B.D)
+
 ## Agradecimentos
+
+(T.B.D)
