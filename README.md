@@ -116,6 +116,20 @@ Nem toda lógica reutilizável no front-end é um composable. O critério adotad
 - **Estado compartilhado via refs em escopo de módulo:**
 Composables como `useAuth` e `useSessionKey` usam refs declaradas no escopo do módulo (fora da função composable), não `provide`/`inject` ou uma store dedicada. Isso garante que todas as chamadas ao composable, em qualquer componente, compartilhem a mesma instância reativa — um padrão de singleton simples, adequado à escala atual do projeto, sem introduzir uma dependência como Pinia apenas para poucos estados globais.
 
+### Trade-offs
+
+- **Verbosidade do Repository Pattern funcional:** 
+Passar `db: AsyncSession` explicitamente em cada função é mais repetitivo do que uma classe que já guarda a sessão como atributo.
+
+- **Custo de junção entre `users` e `user_keys`:** 
+Operações que precisam de usuário + chave pública juntos exigem join ou duas queries, em troca da flexibilidade de ciclos de vida independentes.
+
+- **Escalabilidade do padrão singleton (refs em escopo de módulo):** 
+Não oferece isolamento entre instâncias/testes, nem ferramentas de debug como as do Pinia — adequado à escala atual, mas um ponto de atenção se o projeto crescer.
+
+- **Armazenamento de JWT em `sessionStorage` em vez de `localStorage` ou cookies:**
+A escolha reduz a janela de exposição em caso de XSS: o token é limpo automaticamente ao fechar a aba, em vez de persistir indefinidamente no navegador — ao custo de exigir novo login a cada nova sessão, sem opção de "lembrar-me". Frente a um cookie `httpOnly`, que ofereceria proteção nativa contra leitura via JavaScript, a opção foi preterida em favor de manter o token acessível ao código do cliente — necessário para anexá-lo manualmente ao handshake da conexão WebSocket — além de evitar a complexidade adicional de configurar `SameSite`/CSRF que cookies exigem nesse tipo de fluxo.
+
 ## Como executar localmente
 
 ### Front-end
