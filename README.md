@@ -218,6 +218,10 @@ docker compose exec postgres psql -U rsmiv -d rsmiv_dev
 ```
 Você pode substituir `rsmiv` por outro nome de usuário e `rsmiv_dev` por outro banco de dados, caso alterar os valores correspondentes (`POSTGRES_USER` e `POSTGRES_DB`) em `docker-compose.yml`.
 
+## Limitações Conhecidas
+
+(T.B.D)
+
 ## Roadmap
 
 ### Fases Concluídas
@@ -229,10 +233,6 @@ Você pode substituir `rsmiv` por outro nome de usuário e `rsmiv_dev` por outro
 (T.B.D)
 
 ### Próximos Passos
-
-(T.B.D)
-
-## Limitações Conhecidas
 
 (T.B.D)
 
