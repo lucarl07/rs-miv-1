@@ -81,19 +81,40 @@ rs-miv-1/
 
 ## Arquitetura
 
-Considerando o peso significativo que as decisões de segurança - sanitização de mensagens e criptografia end-to-end (E2E) - deram ao resultado final do projeto, ambas sendo grande fonte de aprendizado, as colocarei como seções separadas das demais decisões arquiteturais e seus trade-offs.
+Dado o peso que a criptografia end-to-end (E2E) teve no resultado final do projeto — sendo o requisito mais complexo e a maior fonte de aprendizado —, ela é apresentada em uma seção própria, separada das demais decisões arquiteturais e seus trade-offs.
 
 ### Criptografia E2E
 
-(T.B.D)
+A criptografia de ponta a ponta é o requisito mais complexo do projeto, e sua implementação segue um modelo híbrido: uma **chave de sessão simétrica (K)**, compartilhada por todos os participantes do canal, é usada para cifrar/decifrar as mensagens em si (AES-GCM via Web Crypto API), enquanto **pares de chaves PGP assimétricas**, gerados individualmente no cliente, são usados exclusivamente para proteger a distribuição dessa chave K entre os usuários.
 
-### Sanitização de mensagens
+- **Geração de identidade PGP:**
+Cada cliente gera, no navegador, um par de chaves PGP via `openpgp.js` (v6, `type: 'curve25519'`, formato nativo RFC 9580). A chave privada é mantida em `sessionStorage` — uma escolha deliberada: por ser volátil (perdida ao fechar a aba), reduz a janela de exposição da chave, ao custo de exigir regeneração a cada nova sessão. A geração ocorre no momento do login, antes da persistência do token de autenticação.
 
-(T.B.D)
+- **Derivação da chave de sessão (K):**
+Diferente de uma abordagem que armazenaria K em um cache como o Redis, K é derivada deterministicamente a partir de uma seed secreta (`SESSION_KEY_SEED`) via HKDF (SHA-256), com salt fixo e um contexto de aplicação (`info`) versionado. Isso elimina qualquer dependência de infraestrutura externa para reconstruir a chave — o servidor a recalcula sob demanda, sem round-trips e sem risco de perda por reinício/expiração de cache. A contrapartida é que uma rotação da seed invalida todo o histórico de mensagens cifradas anteriormente, uma decisão aceita no escopo atual do projeto.
 
-### Outras decisões de design e trade-offs
+- **Distribuição via envelope:**
+Ao se conectar, o servidor cifra K com a chave pública PGP do usuário e envia esse valor como uma mensagem `key_envelope` pelo WebSocket. O cliente a decifra localmente com sua chave privada, nunca expondo K em trânsito de forma legível. Esse desenho garante que apenas quem possui a chave privada correspondente consegue obter a chave de sessão — o servidor nunca tem acesso à mensagem em texto claro, apenas medeia a troca.
 
-(T.B.D)
+ - **Cifragem das mensagens:**
+Com K em mãos, mensagens são cifradas e decifradas localmente via AES-GCM (Web Crypto API), isolado em funções utilitárias puras (`messageCrypto.ts`) — sem estado reativo próprio, portanto não implementado como composable.
+
+### Demais decisões de design
+
+- **Proteção contra Cross-Site Scripting (XSS):**
+É aplicada sobretudo no front-end, em que o conteúdo é sanitizado com `DOMPurify` (configurado com `ALLOWED_TAGS: []`, removendo qualquer tag HTML) antes da renderização, e a interpolação usa `v-text` em vez de `v-html`, evitando qualquer interpretação de HTML bruto; no back-end, o conteúdo das mensagens já chega criptografado, mas é limitado a 6000 caracteres via `Field(max_length=6000)` como teto de segurança (a sanitização ativa via `nh3` foi utilizada durante parte do desenvolvimento, mas removida após a adição de cifragem de mensagens).
+
+- **Repository Pattern funcional:**
+O acesso a dados é isolado em `app/repositories/`, seguindo o Repository Pattern, mas em estilo funcional assíncrono — funções que recebem `db: AsyncSession` como parâmetro, em vez de classes com estado. Essa escolha mantém a lógica de banco desacoplada dos routers, facilitando testes e reuso, sem a sobrecarga de instanciar objetos apenas para agrupar métodos.
+
+- **Separação entre `users` e `user_keys`:**
+As chaves públicas PGP são armazenadas em uma tabela própria (`user_keys`), separada de `users`, com relação um-para-um. Essa separação isola uma responsabilidade específica (identidade criptográfica) da tabela de identidade de conta, evitando acoplar o ciclo de vida de uma à outra — por exemplo, permitindo no futuro que a política de retenção de chaves seja tratada de forma diferente da política de retenção de usuários.
+
+- **Composables vs. funções utilitárias no front-end:**
+Nem toda lógica reutilizável no front-end é um composable. O critério adotado é: se a função não gerencia estado reativo próprio e não precisa ser compartilhada como instância única entre componentes, ela é uma função utilitária pura (ex.: `messageCrypto.ts`, `decodeToken.ts`), não um composable. Composables (`useAuth`, `useWebSocket`, `useSessionKey`, `usePgpIdentity`) são reservados para lógica que de fato orquestra estado reativo.
+
+- **Estado compartilhado via refs em escopo de módulo:**
+Composables como `useAuth` e `useSessionKey` usam refs declaradas no escopo do módulo (fora da função composable), não `provide`/`inject` ou uma store dedicada. Isso garante que todas as chamadas ao composable, em qualquer componente, compartilhem a mesma instância reativa — um padrão de singleton simples, adequado à escala atual do projeto, sem introduzir uma dependência como Pinia apenas para poucos estados globais.
 
 ## Como executar localmente
 
