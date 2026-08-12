@@ -115,6 +115,9 @@ Só após o chat estar funcionando de ponta a ponta.
 
 ## Visão Geral das Fases
 
+> [!NOTE] 
+> **Nota do futuro:** A seção a seguir não foi seguida à risca de fato; no aspecto temporal, uma fase foi realizada de cada vez, ao invés de várias fases sendo realizadas concorrentemente em uma sprint. O que houve, de fato, foram funcionalidades diferentes, pertencentes à uma mesma fase, sendo desenvolvidas no mesmo período.
+
 ```
 Sprint 1       Sprint 2              Sprint 3
 ─────────────────────────────────────────────────────
