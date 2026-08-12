@@ -273,17 +273,38 @@ Atualmente, a restauração de sessão no cliente (`restoreSession()`) trata o c
 
 ## Roadmap
 
-### Fases Concluídas
+O desenvolvimento é guiado por um roadmap faseado para cada versão, dividindo o trabalho em *sprints* (ciclos) e fases; o conteúdo aqui presente é apenas um resumo dos requisitos (funcionais ou não) listados nele. 
 
-(T.B.D)
+> [!TIP]
+> Para mais detalhes sobre o planejamento, documentação e UI/UX design de uma versão, acesse o seu subdiretório correspondente (ex.: `v1` para a versão 1) em `docs`.
 
-### Estado Atual
+### Versão 1 (atual)
 
-(T.B.D)
+| Fase | Descrição | Status |
+|---|---|---|
+| 1 | Esqueleto WebSocket (back-end) | ✅ Concluída |
+| 2 | Chat funcional em Vue 3 (front-end) | ✅ Concluída |
+| 3 | Autenticação (JWT) | ✅ Concluída |
+| 4 | Redis + presença de usuários | ✅ Concluída |
+| 5 | Segurança — Sanitização (XSS) | ✅ Concluída |
+| 5 | Segurança — Criptografia E2E (PGP) | 🔄 Em andamento |
 
-### Próximos Passos
+A Fase 5 está com a parte de sanitização fechada; a criptografia E2E está com o fluxo principal implementado (geração de chaves, derivação de K, distribuição via envelope, cifragem de mensagens), restando resolver o comportamento de restauração de sessão descrito em [Limitações Conhecidas](#limitações-conhecidas).
 
-(T.B.D)
+### Próximos passos
+
+| Categoria | Descrição | Prioridade | Notas (opcional) |
+|---|---|---|---|
+| Arquitetura de Canais | Transição de chat global para múltiplos grupos | 🔴 Alta | |
+| Infraestrutura | Logging avançado na API | 🔴 Alta | |
+| Moderação e Permissões | Permissões hierárquicas no chat | 🟡 Média | Bloqueado até o avanço da arquitetura de canais. |
+| Moderação e Permissões | Remoção e banimento de usuários de um grupo | 🟡 Média | Bloqueado até o avanço da arquitetura de canais. |
+| Persistência de Dados | Soft e hard-delete de mensagens | 🟡 Média | |
+| Persistência de Dados | Soft e hard-delete de usuários | 🟡 Média | |
+| Segurança | Rotação da chave de sessão | 🟢 Baixa | Depende da remoção de membros de grupo ser possível. |
+| Autenticação | OAuth 2.0 | 🟢 Baixa | |
+| Interface | Status de presença em 3 níveis | 🟢 Baixa | |
+| Interface | Landing page no site | 🟢 Baixa | |
 
 ## Agradecimentos
 
