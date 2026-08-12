@@ -255,9 +255,9 @@ Você pode substituir `rsmiv` por outro nome de usuário e `rsmiv_dev` por outro
 
 ## Limitações Conhecidas
 
-### Sessão sem novo par de chaves PGP
+### Ausência de rate-limiting
 
-Atualmente, a restauração de sessão no cliente (`restoreSession()`) trata o caso em que existe um token válido mas a chave privada PGP não está mais em `sessionStorage`, forçando um novo login. O caso inverso — chave presente, mas sessão restaurada sem regenerar o par de chaves — ainda não foi resolvido de forma definitiva, e está listado entre os itens em aberto do projeto.
+O sistema não implementa limitação de taxa (rate-limiting) em nenhuma camada — nem no envio de mensagens via WebSocket, nem nos endpoints de autenticação (registro/login). Isso significa que não há proteção nativa contra spam de mensagens ou tentativas de força bruta em credenciais. Mitigar isso exigiria, por exemplo, controle de taxa por usuário/IP (em memória ou via Redis) antes de mensagens serem processadas ou broadcast, e nos endpoints sensíveis de autenticação.
 
 ### Ausência de rotação da chave de sessão (K)
 
@@ -267,9 +267,9 @@ A chave de sessão simétrica (K) é fixa, derivada deterministicamente da mesma
 
 A exclusão de uma conta de usuário não possui uma política definida de soft-delete. Como consequência, o comportamento de `Message.user_id` diante da remoção de um usuário (cascade, `SET NULL`, ou bloqueio) ainda não foi decidido, e o relacionamento `User.messages` não possui uma estratégia de cascade explícita no momento.
 
-### Ausência de rate-limiting
+### Sessão sem novo par de chaves PGP
 
-O sistema não implementa limitação de taxa (rate-limiting) em nenhuma camada — nem no envio de mensagens via WebSocket, nem nos endpoints de autenticação (registro/login). Isso significa que não há proteção nativa contra spam de mensagens ou tentativas de força bruta em credenciais. Mitigar isso exigiria, por exemplo, controle de taxa por usuário/IP (em memória ou via Redis) antes de mensagens serem processadas ou broadcast, e nos endpoints sensíveis de autenticação.
+Atualmente, a restauração de sessão no cliente (`restoreSession()`) trata o caso em que existe um token válido mas a chave privada PGP não está mais em `sessionStorage`, forçando um novo login. O caso inverso — chave presente, mas sessão restaurada sem regenerar o par de chaves — ainda não foi resolvido de forma definitiva, e está listado entre os itens em aberto do projeto.
 
 ## Roadmap
 
