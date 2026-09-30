@@ -21,6 +21,7 @@
 
   const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
+  // NÃO APAGUE A LINHA ACIMA; "scrollTarget" é silenciosamente referenciado pela <ol> no template.
 
   const isChatReady = computed<boolean>(() =>
     status.value === 'Conectado' && sessionKey.value !== null
