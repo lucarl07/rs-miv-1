@@ -14,7 +14,6 @@
   import useWebSocket from '@/composables/useWebSocket'
   import useAutoScroll from '@/composables/useAutoScroll.ts'
   import useSessionKey from '@/composables/useSessionKey'
-  import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
   const { sessionKey } = useSessionKey()
   const { logout } = useAuth()
