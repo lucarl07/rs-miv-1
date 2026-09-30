@@ -48,7 +48,10 @@
             :username="message.nickname"
             :content="message.content"
             :timestamp="message.timestamp"
-            />
+            :isSystemMessage="
+              message.nickname === 'Mensagem do sistema' ? true : false
+            "
+          />
         </li>
       </ol>
       <MessageInput
