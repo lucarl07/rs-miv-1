@@ -14,7 +14,6 @@
   import useWebSocket from '@/composables/useWebSocket'
   import useAutoScroll from '@/composables/useAutoScroll.ts'
   import useSessionKey from '@/composables/useSessionKey'
-  import genUniqueNickname from '@/utils/genUniqueNickname.ts'
 
   const { sessionKey } = useSessionKey()
   const { logout } = useAuth()
@@ -22,6 +21,7 @@
 
   const { status, messages, onlineUsers, send, disconnect } = useWebSocket()
   const { scrollTarget } = useAutoScroll(messages.value, () => true)
+  // NÃO APAGUE A LINHA ACIMA; "scrollTarget" é silenciosamente referenciado pela <ol> no template.
 
   const isChatReady = computed<boolean>(() =>
     status.value === 'Conectado' && sessionKey.value !== null
@@ -48,7 +48,10 @@
             :username="message.nickname"
             :content="message.content"
             :timestamp="message.timestamp"
-            />
+            :isSystemMessage="
+              message.nickname === 'Mensagem do sistema' ? true : false
+            "
+          />
         </li>
       </ol>
       <MessageInput
